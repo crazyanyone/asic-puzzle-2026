@@ -1,0 +1,43 @@
+{
+  "din": [
+    "M0_mux2.A1"
+  ],
+  "en": [
+    "M0_mux2.S",
+    "M1_mux2.S"
+  ],
+  "clk": [
+    "FF0_dfrtp.CLK",
+    "FF1_dfrtp.CLK"
+  ],
+  "rst_n": [
+    "FF0_dfrtp.RESET_B",
+    "FF1_dfrtp.RESET_B"
+  ],
+  "('toy', 0)": [
+    "M0_mux2.X",
+    "FF0_dfrtp.D"
+  ],
+  "('toy', 1)": [
+    "FF0_dfrtp.Q",
+    "M0_mux2.A0",
+    "M1_mux2.A1",
+    "INV0_inv.A"
+  ],
+  "('toy', 2)": [
+    "M1_mux2.X",
+    "FF1_dfrtp.D"
+  ],
+  "('toy', 3)": [
+    "FF1_dfrtp.Q",
+    "M1_mux2.A0",
+    "AND0_and2.A"
+  ],
+  "('toy', 4)": [
+    "INV0_inv.Y",
+    "AND0_and2.B"
+  ],
+  "success": [
+    "AND0_and2.X"
+  ]
+}
