@@ -32,6 +32,7 @@ class CellModel:
     outputs: tuple[str, ...] = ()
     clock_pins: tuple[str, ...] = ()
     reset_pins: tuple[str, ...] = ()
+    set_pins: tuple[str, ...] = ()
     function: str = ""
     sequential: bool = False
     known: bool = True
@@ -41,7 +42,12 @@ class CellModel:
             return "power"
         if pin in self.outputs:
             return "output"
-        if pin in self.inputs or pin in self.clock_pins or pin in self.reset_pins:
+        if (
+            pin in self.inputs
+            or pin in self.clock_pins
+            or pin in self.reset_pins
+            or pin in self.set_pins
+        ):
             return "input"
         return "unknown"
 
@@ -52,6 +58,8 @@ class CellModel:
             return "clock"
         if pin in self.reset_pins:
             return "reset"
+        if pin in self.set_pins:
+            return "set"
         if pin in self.outputs:
             return "state" if self.sequential else "data"
         if pin in self.inputs:
@@ -69,6 +77,14 @@ def _comb(
         name=name,
         inputs=tuple(inputs),
         outputs=(output,),
+        function=function,
+    )
+
+
+def _const(name: str, outputs: Iterable[str], function: str) -> CellModel:
+    return CellModel(
+        name=name,
+        outputs=tuple(outputs),
         function=function,
     )
 
@@ -175,6 +191,125 @@ CELL_MODELS: dict[str, CellModel] = {
         function="positive-edge D flip-flop",
         sequential=True,
     ),
+    "dfstp": CellModel(
+        name="dfstp",
+        inputs=("D",),
+        outputs=("Q",),
+        clock_pins=("CLK",),
+        set_pins=("SET_B",),
+        function="positive-edge D flip-flop; asynchronous active-low set",
+        sequential=True,
+    ),
+    # --- Puzzle netlist cells (from Sky130 HD functional Verilog) ---
+    "conb": _const("conb", ("HI", "LO"), "HI=1, LO=0"),
+    "and2b": _comb("and2b", ("A_N", "B"), "X", "X = !A_N & B"),
+    "and3b": _comb("and3b", ("A_N", "B", "C"), "X", "X = !A_N & B & C"),
+    "and4b": _comb("and4b", ("A_N", "B", "C", "D"), "X", "X = !A_N & B & C & D"),
+    "nand2b": _comb("nand2b", ("A_N", "B"), "Y", "Y = !(!A_N & B)"),
+    "nand3b": _comb("nand3b", ("A_N", "B", "C"), "Y", "Y = !(!A_N & B & C)"),
+    "nor3b": _comb("nor3b", ("A", "B", "C_N"), "Y", "Y = !((A | B) | !C_N)"),
+    "nor4b": _comb("nor4b", ("A", "B", "C", "D_N"), "Y", "Y = !((A | B | C) | !D_N)"),
+    "or3b": _comb("or3b", ("A", "B", "C_N"), "X", "X = A | B | !C_N"),
+    "or4b": _comb("or4b", ("A", "B", "C", "D_N"), "X", "X = A | B | C | !D_N"),
+    "or4bb": _comb(
+        "or4bb", ("A", "B", "C_N", "D_N"), "X", "X = A | B | !C_N | !D_N"
+    ),
+    "a211o": _comb(
+        "a211o", ("A1", "A2", "B1", "C1"), "X", "X = (A1 & A2) | B1 | C1"
+    ),
+    "a211oi": _comb(
+        "a211oi", ("A1", "A2", "B1", "C1"), "Y", "Y = !((A1 & A2) | B1 | C1)"
+    ),
+    "a2111oi": _comb(
+        "a2111oi",
+        ("A1", "A2", "B1", "C1", "D1"),
+        "Y",
+        "Y = !((A1 & A2) | B1 | C1 | D1)",
+    ),
+    "a221o": _comb(
+        "a221o",
+        ("A1", "A2", "B1", "B2", "C1"),
+        "X",
+        "X = (A1 & A2) | (B1 & B2) | C1",
+    ),
+    "a221oi": _comb(
+        "a221oi",
+        ("A1", "A2", "B1", "B2", "C1"),
+        "Y",
+        "Y = !((A1 & A2) | (B1 & B2) | C1)",
+    ),
+    "a311o": _comb(
+        "a311o",
+        ("A1", "A2", "A3", "B1", "C1"),
+        "X",
+        "X = (A1 & A2 & A3) | B1 | C1",
+    ),
+    "a32o": _comb(
+        "a32o",
+        ("A1", "A2", "A3", "B1", "B2"),
+        "X",
+        "X = (A1 & A2 & A3) | (B1 & B2)",
+    ),
+    "a41oi": _comb(
+        "a41oi",
+        ("A1", "A2", "A3", "A4", "B1"),
+        "Y",
+        "Y = !((A1 & A2 & A3 & A4) | B1)",
+    ),
+    "o211a": _comb(
+        "o211a",
+        ("A1", "A2", "B1", "C1"),
+        "X",
+        "X = (A1 | A2) & B1 & C1",
+    ),
+    "o211ai": _comb(
+        "o211ai",
+        ("A1", "A2", "B1", "C1"),
+        "Y",
+        "Y = !((A1 | A2) & B1 & C1)",
+    ),
+    "o221a": _comb(
+        "o221a",
+        ("A1", "A2", "B1", "B2", "C1"),
+        "X",
+        "X = (A1 | A2) & (B1 | B2) & C1",
+    ),
+    "o22a": _comb(
+        "o22a", ("A1", "A2", "B1", "B2"), "X", "X = (A1 | A2) & (B1 | B2)"
+    ),
+    "o22ai": _comb(
+        "o22ai", ("A1", "A2", "B1", "B2"), "Y", "Y = !((A1 | A2) & (B1 | B2))"
+    ),
+    "o2bb2a": _comb(
+        "o2bb2a",
+        ("A1_N", "A2_N", "B1", "B2"),
+        "X",
+        "X = !(A1_N & A2_N) & (B1 | B2)",
+    ),
+    "o311a": _comb(
+        "o311a",
+        ("A1", "A2", "A3", "B1", "C1"),
+        "X",
+        "X = (A1 | A2 | A3) & B1 & C1",
+    ),
+    "o31a": _comb(
+        "o31a", ("A1", "A2", "A3", "B1"), "X", "X = (A1 | A2 | A3) & B1"
+    ),
+    "o31ai": _comb(
+        "o31ai", ("A1", "A2", "A3", "B1"), "Y", "Y = !((A1 | A2 | A3) & B1)"
+    ),
+    "o32a": _comb(
+        "o32a",
+        ("A1", "A2", "A3", "B1", "B2"),
+        "X",
+        "X = (A1 | A2 | A3) & (B1 | B2)",
+    ),
+    "o32ai": _comb(
+        "o32ai",
+        ("A1", "A2", "A3", "B1", "B2"),
+        "Y",
+        "Y = !((A1 | A2 | A3) & (B1 | B2))",
+    ),
 }
 
 
@@ -270,6 +405,50 @@ class EnabledRegister:
     data_pin: str
     data_net: str
     select_net: str
+
+
+@dataclass
+class ShiftRegister:
+    """A strictly verified serial shift-register abstraction.
+
+    `stages` are ordered from the serial-input stage toward the final stage.
+    The original cells and nets remain in `Design`; this object is a view over
+    them, not a destructive replacement.
+    """
+
+    name: str
+    stages: tuple[EnabledRegister, ...]
+    serial_input_net: str
+    enable_net: str
+    clock_net: str
+    reset_net: str | None
+    parallel_output_nets: tuple[str, ...]
+    external_q_loads: dict[str, tuple[str, ...]]
+    evidence: tuple[str, ...]
+
+    @property
+    def width(self) -> int:
+        return len(self.stages)
+
+    @property
+    def member_instances(self) -> frozenset[str]:
+        return frozenset(
+            instance
+            for stage in self.stages
+            for instance in (stage.flip_flop, stage.mux)
+        )
+
+
+@dataclass
+class ShiftRegisterRejection:
+    candidates: tuple[str, ...]
+    reasons: tuple[str, ...]
+
+
+@dataclass
+class ShiftRegisterAnalysis:
+    shift_registers: list[ShiftRegister]
+    rejections: list[ShiftRegisterRejection]
 
 
 @dataclass
@@ -561,7 +740,399 @@ class Design:
             chains.append([by_ff[name]])
         return chains
 
+    def strict_shift_registers(self) -> ShiftRegisterAnalysis:
+        """Recognize only structurally exact mux/DFF serial shift registers.
+
+        Strictness rules:
+
+        * every stage is a known sequential cell with its complete expected
+          signal-pin set;
+        * D is driven only by one mux X, and that D net has no other terminals;
+        * the mux has exactly A0/A1/S/X and exactly one data input is own Q;
+        * Q has exactly one driver, the stage's Q pin;
+        * stages form one unbranched, acyclic, multi-stage chain;
+        * all stages share clock, reset, enable, and mux orientation;
+        * loads on muxes inside the abstraction exactly match the expected
+          self-hold and next-stage serial connections.
+
+        Loads on cells outside the abstraction, including downstream muxes,
+        are legal parallel-output taps and are recorded on the boundary.
+        """
+        local_stages: dict[str, EnabledRegister] = {}
+        rejections: list[ShiftRegisterRejection] = []
+
+        for flip_flop in sorted(
+            (
+                instance
+                for instance in self.instances.values()
+                if instance.sequential
+            ),
+            key=lambda instance: instance.name,
+        ):
+            reasons: list[str] = []
+            if not flip_flop.model.known:
+                reasons.append("sequential cell model is not authoritative")
+
+            expected_ff_pins = set(
+                flip_flop.model.inputs
+                + flip_flop.model.outputs
+                + flip_flop.model.clock_pins
+                + flip_flop.model.reset_pins
+            )
+            actual_ff_pins = {
+                terminal.pin for terminal in self.signal_terminals(flip_flop)
+            }
+            if actual_ff_pins != expected_ff_pins:
+                reasons.append(
+                    "flip-flop signal pins differ from model: "
+                    f"expected={sorted(expected_ff_pins)}, "
+                    f"actual={sorted(actual_ff_pins)}"
+                )
+            if "D" not in flip_flop.pins or "Q" not in flip_flop.pins:
+                reasons.append("flip-flop does not expose both D and Q")
+
+            mux: Instance | None = None
+            hold_pin = ""
+            data_pin = ""
+            d_net_name = flip_flop.pins["D"].net if "D" in flip_flop.pins else ""
+            q_net_name = flip_flop.pins["Q"].net if "Q" in flip_flop.pins else ""
+
+            if d_net_name:
+                d_net = self.nets[d_net_name]
+                if len(d_net.drivers) != 1:
+                    reasons.append(
+                        f"D net has {len(d_net.drivers)} drivers instead of one"
+                    )
+                else:
+                    driver = d_net.drivers[0]
+                    candidate_mux = self.instances[driver.instance]
+                    if candidate_mux.cell_type != "mux2" or driver.pin != "X":
+                        reasons.append(
+                            f"D driver is {driver.name}, not a mux2.X output"
+                        )
+                    else:
+                        mux = candidate_mux
+
+                functional_d_terminals = {
+                    terminal.name
+                    for terminal in d_net.terminals
+                    if terminal.role != "power"
+                }
+                expected_d_terminals = {f"{flip_flop.name}.D"}
+                if d_net.drivers:
+                    expected_d_terminals.add(d_net.drivers[0].name)
+                if functional_d_terminals != expected_d_terminals:
+                    reasons.append(
+                        "D net is not point-to-point mux.X -> flip-flop.D: "
+                        f"{sorted(functional_d_terminals)}"
+                    )
+
+            if q_net_name:
+                q_net = self.nets[q_net_name]
+                if [terminal.name for terminal in q_net.drivers] != [
+                    f"{flip_flop.name}.Q"
+                ]:
+                    reasons.append(
+                        "Q net is not driven exclusively by this flip-flop.Q"
+                    )
+
+            if mux is not None:
+                expected_mux_pins = set(
+                    mux.model.inputs
+                    + mux.model.outputs
+                    + mux.model.clock_pins
+                    + mux.model.reset_pins
+                )
+                actual_mux_pins = {
+                    terminal.pin for terminal in self.signal_terminals(mux)
+                }
+                if not mux.model.known:
+                    reasons.append("mux cell model is not authoritative")
+                if actual_mux_pins != expected_mux_pins:
+                    reasons.append(
+                        "mux signal pins differ from model: "
+                        f"expected={sorted(expected_mux_pins)}, "
+                        f"actual={sorted(actual_mux_pins)}"
+                    )
+                required_mux_pins = {"A0", "A1", "S", "X"}
+                if not required_mux_pins <= set(mux.pins):
+                    reasons.append("mux is missing one of A0/A1/S/X")
+                elif q_net_name:
+                    self_inputs = [
+                        pin
+                        for pin in ("A0", "A1")
+                        if mux.pins[pin].net == q_net_name
+                    ]
+                    if len(self_inputs) != 1:
+                        reasons.append(
+                            "exactly one mux data input must be the stage's own Q"
+                        )
+                    else:
+                        hold_pin = self_inputs[0]
+                        data_pin = "A1" if hold_pin == "A0" else "A0"
+
+            if reasons or mux is None or not hold_pin:
+                rejections.append(
+                    ShiftRegisterRejection(
+                        candidates=(flip_flop.name,),
+                        reasons=tuple(dict.fromkeys(reasons)),
+                    )
+                )
+                continue
+
+            local_stages[flip_flop.name] = EnabledRegister(
+                flip_flop=flip_flop.name,
+                mux=mux.name,
+                q_net=q_net_name,
+                d_net=d_net_name,
+                hold_pin=hold_pin,
+                data_pin=data_pin,
+                data_net=mux.pins[data_pin].net,
+                select_net=mux.pins["S"].net,
+            )
+
+        predecessor: dict[str, str | None] = {}
+        successors: dict[str, list[str]] = {
+            flip_flop: [] for flip_flop in local_stages
+        }
+        adjacency: dict[str, set[str]] = {
+            flip_flop: set() for flip_flop in local_stages
+        }
+        for flip_flop, stage in local_stages.items():
+            source = self.driver_of(stage.data_net)
+            pred = (
+                source.instance
+                if source is not None
+                and source.pin == "Q"
+                and source.instance in local_stages
+                else None
+            )
+            predecessor[flip_flop] = pred
+            if pred is not None:
+                successors[pred].append(flip_flop)
+                adjacency[pred].add(flip_flop)
+                adjacency[flip_flop].add(pred)
+
+        components: list[set[str]] = []
+        unvisited = set(local_stages)
+        while unvisited:
+            seed = min(unvisited)
+            component: set[str] = set()
+            pending = [seed]
+            while pending:
+                current = pending.pop()
+                if current in component:
+                    continue
+                component.add(current)
+                pending.extend(adjacency[current] - component)
+            unvisited -= component
+            components.append(component)
+
+        abstractions: list[ShiftRegister] = []
+        used_names: set[str] = set()
+        for component in sorted(components, key=lambda item: sorted(item)):
+            reasons: list[str] = []
+            if len(component) < 2:
+                reasons.append(
+                    "only one enabled stage; insufficient evidence for a shift chain"
+                )
+
+            heads = [
+                flip_flop
+                for flip_flop in component
+                if predecessor[flip_flop] not in component
+            ]
+            if len(heads) != 1:
+                reasons.append(
+                    f"chain must have exactly one head, found {len(heads)}"
+                )
+            branched = {
+                flip_flop: [
+                    successor
+                    for successor in successors[flip_flop]
+                    if successor in component
+                ]
+                for flip_flop in component
+                if len(
+                    [
+                        successor
+                        for successor in successors[flip_flop]
+                        if successor in component
+                    ]
+                )
+                > 1
+            }
+            if branched:
+                reasons.append(
+                    "chain branches at "
+                    + ", ".join(
+                        f"{name}->{sorted(children)}"
+                        for name, children in sorted(branched.items())
+                    )
+                )
+
+            ordered_names: list[str] = []
+            if len(heads) == 1 and not branched:
+                current: str | None = heads[0]
+                while current is not None and current not in ordered_names:
+                    ordered_names.append(current)
+                    children = [
+                        successor
+                        for successor in successors[current]
+                        if successor in component
+                    ]
+                    current = children[0] if children else None
+                if len(ordered_names) != len(component):
+                    reasons.append(
+                        "chain is cyclic or does not cover every candidate stage"
+                    )
+
+            ordered_stages = [
+                local_stages[name] for name in ordered_names
+            ]
+            if ordered_stages:
+                enable_nets = {stage.select_net for stage in ordered_stages}
+                hold_pins = {stage.hold_pin for stage in ordered_stages}
+                data_pins = {stage.data_pin for stage in ordered_stages}
+                clock_nets: set[str] = set()
+                reset_nets: set[str | None] = set()
+
+                for stage in ordered_stages:
+                    flip_flop = self.instances[stage.flip_flop]
+                    clocks = [
+                        flip_flop.pins[pin].net
+                        for pin in flip_flop.model.clock_pins
+                        if pin in flip_flop.pins
+                    ]
+                    resets = [
+                        flip_flop.pins[pin].net
+                        for pin in flip_flop.model.reset_pins
+                        if pin in flip_flop.pins
+                    ]
+                    if len(clocks) != 1:
+                        reasons.append(
+                            f"{stage.flip_flop} does not have exactly one clock"
+                        )
+                    else:
+                        clock_nets.add(clocks[0])
+                    if len(resets) > 1:
+                        reasons.append(
+                            f"{stage.flip_flop} has multiple reset controls"
+                        )
+                    else:
+                        reset_nets.add(resets[0] if resets else None)
+
+                if len(enable_nets) != 1:
+                    reasons.append("stages do not share one enable net")
+                if len(clock_nets) != 1:
+                    reasons.append("stages do not share one clock net")
+                if len(reset_nets) != 1:
+                    reasons.append("stages do not share one reset net")
+                if len(hold_pins) != 1 or len(data_pins) != 1:
+                    reasons.append("mux hold/data orientation changes within chain")
+
+                member_muxes = {stage.mux for stage in ordered_stages}
+                for index, stage in enumerate(ordered_stages):
+                    q_net = self.nets[stage.q_net]
+                    actual_internal_mux_loads = {
+                        terminal.name
+                        for terminal in q_net.loads
+                        if terminal.instance in member_muxes
+                    }
+                    allowed_internal_mux_loads = {
+                        f"{stage.mux}.{stage.hold_pin}"
+                    }
+                    if index + 1 < len(ordered_stages):
+                        successor = ordered_stages[index + 1]
+                        allowed_internal_mux_loads.add(
+                            f"{successor.mux}.{successor.data_pin}"
+                        )
+                    if (
+                        actual_internal_mux_loads
+                        != allowed_internal_mux_loads
+                    ):
+                        reasons.append(
+                            f"{stage.flip_flop} Q has incorrect internal mux loads: "
+                            f"expected={sorted(allowed_internal_mux_loads)}, "
+                            f"actual={sorted(actual_internal_mux_loads)}"
+                        )
+
+            if reasons:
+                rejections.append(
+                    ShiftRegisterRejection(
+                        candidates=tuple(sorted(component)),
+                        reasons=tuple(dict.fromkeys(reasons)),
+                    )
+                )
+                continue
+
+            first = ordered_stages[0]
+            serial_net = self.nets[first.data_net]
+            if serial_net.is_port:
+                input_label = "_".join(serial_net.aliases)
+            else:
+                input_label = "internal"
+            safe_label = re.sub(r"[^A-Za-z0-9_]+", "_", input_label).strip("_")
+            base_name = f"shift_{safe_label or 'register'}"
+            name = base_name
+            suffix = 2
+            while name in used_names:
+                name = f"{base_name}_{suffix}"
+                suffix += 1
+            used_names.add(name)
+
+            external_q_loads: dict[str, tuple[str, ...]] = {}
+            for stage in ordered_stages:
+                q_net = self.nets[stage.q_net]
+                internal_muxes = {
+                    f"{stage.mux}.{stage.hold_pin}",
+                    *(
+                        f"{candidate.mux}.{candidate.data_pin}"
+                        for candidate in ordered_stages
+                        if candidate.data_net == stage.q_net
+                    ),
+                }
+                external_q_loads[stage.q_net] = tuple(
+                    sorted(
+                        terminal.name
+                        for terminal in q_net.loads
+                        if terminal.name not in internal_muxes
+                    )
+                )
+
+            abstractions.append(
+                ShiftRegister(
+                    name=name,
+                    stages=tuple(ordered_stages),
+                    serial_input_net=first.data_net,
+                    enable_net=first.select_net,
+                    clock_net=next(
+                        iter(
+                            self.instances[first.flip_flop].pins[pin].net
+                            for pin in self.instances[
+                                first.flip_flop
+                            ].model.clock_pins
+                        )
+                    ),
+                    reset_net=next(iter(reset_nets)),
+                    parallel_output_nets=tuple(
+                        stage.q_net for stage in ordered_stages
+                    ),
+                    external_q_loads=external_q_loads,
+                    evidence=(
+                        "exclusive point-to-point mux.X -> D wiring",
+                        "exactly one self-feedback mux input per stage",
+                        "single unbranched acyclic serial chain",
+                        "uniform clock, reset, enable, and mux orientation",
+                        "internal mux loads exactly match hold/shift wiring",
+                    ),
+                )
+            )
+
+        return ShiftRegisterAnalysis(abstractions, rejections)
+
     def to_dict(self) -> dict[str, object]:
+        shift_analysis = self.strict_shift_registers()
         return {
             "source": self.source_path,
             "ports": {
@@ -599,6 +1170,50 @@ class Design:
                     "unknowns": [terminal.name for terminal in net.unknowns],
                 }
                 for name, net in sorted(self.nets.items())
+            },
+            "abstractions": {
+                "shift_registers": [
+                    {
+                        "name": shift_register.name,
+                        "kind": "shift_register",
+                        "width": shift_register.width,
+                        "serial_input_net": shift_register.serial_input_net,
+                        "enable_net": shift_register.enable_net,
+                        "clock_net": shift_register.clock_net,
+                        "reset_net": shift_register.reset_net,
+                        "parallel_output_nets": list(
+                            shift_register.parallel_output_nets
+                        ),
+                        "member_instances": sorted(
+                            shift_register.member_instances
+                        ),
+                        "stages": [
+                            {
+                                "index": index,
+                                "flip_flop": stage.flip_flop,
+                                "mux": stage.mux,
+                                "q_net": stage.q_net,
+                                "d_net": stage.d_net,
+                            }
+                            for index, stage in enumerate(
+                                shift_register.stages
+                            )
+                        ],
+                        "external_q_loads": {
+                            net: list(loads)
+                            for net, loads in shift_register.external_q_loads.items()
+                        },
+                        "evidence": list(shift_register.evidence),
+                    }
+                    for shift_register in shift_analysis.shift_registers
+                ],
+                "shift_register_rejections": [
+                    {
+                        "candidates": list(rejection.candidates),
+                        "reasons": list(rejection.reasons),
+                    }
+                    for rejection in shift_analysis.rejections
+                ],
             },
             "validation_issues": self.validation_issues(),
         }

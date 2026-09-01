@@ -9,6 +9,7 @@ Examples:
     python3 analyze.py nets.json cone S --dot success-cone.dot
     python3 analyze.py nets.json registers
     python3 analyze.py nets.json shift-chains --dot shift-chains.dot
+    python3 analyze.py nets.json shift-registers --dot shift-registers.dot
     python3 analyze.py nets.json export --out design.json
 
 Render a DOT file with Graphviz:
@@ -23,7 +24,14 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from netlist_ir import Design, EnabledRegister, Instance, Net, Terminal
+from netlist_ir import (
+    Design,
+    EnabledRegister,
+    Instance,
+    Net,
+    ShiftRegister,
+    Terminal,
+)
 
 
 def natural_key(value: str) -> tuple[object, ...]:
@@ -119,6 +127,80 @@ def write_dot(
     print(f"Render with: dot -Tsvg {output_path} -o {svg_path}")
 
 
+def write_shift_register_dot(
+    design: Design,
+    shift_registers: list[ShiftRegister],
+    output_path: str,
+) -> None:
+    """Write a high-level graph containing one node per proven abstraction."""
+    lines = [
+        "digraph shift_registers {",
+        "  rankdir=LR;",
+        "  graph [fontname=\"Helvetica\", labelloc=t];",
+        "  node [fontname=\"Helvetica\"];",
+        "  edge [fontname=\"Helvetica\", fontsize=9];",
+        '  label="Strict shift-register abstractions";',
+    ]
+    emitted_nets: set[str] = set()
+
+    def emit_net(net_name: str) -> str:
+        node_id = "net:" + net_name
+        if net_name not in emitted_nets:
+            emitted_nets.add(net_name)
+            net = design.nets[net_name]
+            label = (
+                "|".join(net.aliases)
+                if net.is_port
+                else design.source_description(net_name)
+            )
+            lines.append(
+                f"  {quoted(node_id)} [shape=diamond, label={quoted(label)}];"
+            )
+        return node_id
+
+    for shift_register in shift_registers:
+        block_id = "block:" + shift_register.name
+        block_label = (
+            f"{shift_register.name}\\nShiftRegister[{shift_register.width}]"
+        )
+        lines.append(
+            f"  {quoted(block_id)} "
+            f"[shape=box3d, label={quoted(block_label)}];"
+        )
+        controls = [
+            ("serial", shift_register.serial_input_net),
+            ("enable", shift_register.enable_net),
+            ("clock", shift_register.clock_net),
+        ]
+        if shift_register.reset_net is not None:
+            controls.append(("reset", shift_register.reset_net))
+        for role, net_name in controls:
+            net_id = emit_net(net_name)
+            lines.append(
+                f"  {quoted(net_id)} -> {quoted(block_id)} "
+                f"[label={quoted(role)}];"
+            )
+
+        output_id = "outputs:" + shift_register.name
+        output_label = (
+            f"{shift_register.name}.Q[{shift_register.width - 1}:0]\\n"
+            f"{sum(bool(loads) for loads in shift_register.external_q_loads.values())} "
+            "externally used taps"
+        )
+        lines.append(
+            f"  {quoted(output_id)} [shape=ellipse, label={quoted(output_label)}];"
+        )
+        lines.append(
+            f"  {quoted(block_id)} -> {quoted(output_id)} [label=\"parallel Q\"];"
+        )
+
+    lines.append("}")
+    Path(output_path).write_text("\n".join(lines) + "\n")
+    svg_path = Path(output_path).with_suffix(".svg")
+    print(f"Wrote {output_path}")
+    print(f"Render with: dot -Tsvg {output_path} -o {svg_path}")
+
+
 def print_summary(design: Design) -> None:
     signal_nets = [net for net in design.nets.values() if not net.is_power]
     sequential = [instance for instance in design.instances.values() if instance.sequential]
@@ -129,6 +211,8 @@ def print_summary(design: Design) -> None:
     print(f"Nets:            {len(design.nets)} ({len(signal_nets)} non-power)")
     print(f"Terminals:       {len(design.terminals)}")
     print(f"State elements:  {len(sequential)}")
+    shift_analysis = design.strict_shift_registers()
+    print(f"Shift registers: {len(shift_analysis.shift_registers)} strictly verified")
     print()
 
     print("Ports (direction inferred from cell pin directions):")
@@ -232,9 +316,32 @@ def print_cone(
     print(f"Nets visited:       {len(cone.nets)}")
     print()
     if cone.state_boundaries:
-        print("State boundaries (traversal stopped at these Q drivers):")
-        for name in sorted(cone.state_boundaries, key=natural_key):
-            print(f"  {name}")
+        shift_analysis = design.strict_shift_registers()
+        covered: set[str] = set()
+        relevant_shift_registers: list[tuple[ShiftRegister, set[str]]] = []
+        for shift_register in shift_analysis.shift_registers:
+            state_members = {
+                stage.flip_flop for stage in shift_register.stages
+            }
+            overlap = state_members & cone.state_boundaries
+            if overlap:
+                relevant_shift_registers.append((shift_register, overlap))
+                covered.update(overlap)
+
+        if relevant_shift_registers:
+            print("Abstracted state boundaries:")
+            for shift_register, overlap in relevant_shift_registers:
+                print(
+                    f"  {shift_register.name}: ShiftRegister"
+                    f"[{shift_register.width}] "
+                    f"({len(overlap)}/{shift_register.width} bits in cone)"
+                )
+
+        unabstracted = cone.state_boundaries - covered
+        if unabstracted:
+            print("Unabstracted state boundaries:")
+            for name in sorted(unabstracted, key=natural_key):
+                print(f"  {name}")
 
     counts = Counter(design.instances[name].cell_type for name in combinational)
     if counts:
@@ -341,6 +448,58 @@ def print_shift_chains(design: Design, dot_path: str | None) -> None:
         write_dot(design, cells, nets, dot_path, "Detected enabled shift chains")
 
 
+def print_shift_registers(
+    design: Design,
+    show_rejected: bool,
+    dot_path: str | None,
+) -> None:
+    analysis = design.strict_shift_registers()
+    print(f"Strict shift-register abstractions: {len(analysis.shift_registers)}")
+    print(f"Rejected candidate groups:          {len(analysis.rejections)}")
+    print()
+
+    for shift_register in analysis.shift_registers:
+        serial_source = design.source_description(
+            shift_register.serial_input_net
+        )
+        print(f"{shift_register.name}: ShiftRegister[{shift_register.width}]")
+        print(f"  serial input: {serial_source}")
+        print(f"  enable:       {shift_register.enable_net}")
+        print(f"  clock:        {shift_register.clock_net}")
+        print(f"  reset:        {shift_register.reset_net or '(none)'}")
+        print(
+            "  transition:   "
+            f"on clock, if {shift_register.enable_net}, "
+            "Q[i+1] <- Q[i] and Q[0] <- serial input"
+        )
+        print(f"  members:      {len(shift_register.member_instances)} instances")
+        print("  stages:")
+        for index, stage in enumerate(shift_register.stages):
+            external_loads = shift_register.external_q_loads[stage.q_net]
+            print(
+                f"    [{index}] {stage.flip_flop} + {stage.mux}; "
+                f"Q={stage.q_net}; external loads={len(external_loads)}"
+            )
+        print("  strict evidence:")
+        for evidence in shift_register.evidence:
+            print(f"    - {evidence}")
+        print()
+
+    if show_rejected and analysis.rejections:
+        print("Rejected candidates:")
+        for rejection in analysis.rejections:
+            print(f"  {', '.join(rejection.candidates)}")
+            for reason in rejection.reasons:
+                print(f"    - {reason}")
+
+    if dot_path:
+        write_shift_register_dot(
+            design,
+            analysis.shift_registers,
+            dot_path,
+        )
+
+
 def export_design(design: Design, output_path: str) -> None:
     with Path(output_path).open("w") as fh:
         json.dump(design.to_dict(), fh, indent=2)
@@ -388,6 +547,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     chain_parser.add_argument("--dot", help="Write detected chains as DOT")
 
+    shift_register_parser = subparsers.add_parser(
+        "shift-registers",
+        help="Build strictly verified shift-register abstractions",
+    )
+    shift_register_parser.add_argument(
+        "--show-rejected",
+        action="store_true",
+        help="Explain why candidate stages or groups failed strict checks",
+    )
+    shift_register_parser.add_argument(
+        "--dot", help="Write a high-level abstraction graph as DOT"
+    )
+
     export_parser = subparsers.add_parser(
         "export", help="Write the derived semantic structure as JSON"
     )
@@ -412,6 +584,12 @@ def main() -> int:
             print_registers(design, args.dot)
         elif args.command == "shift-chains":
             print_shift_chains(design, args.dot)
+        elif args.command == "shift-registers":
+            print_shift_registers(
+                design,
+                args.show_rejected,
+                args.dot,
+            )
         elif args.command == "export":
             export_design(design, args.out)
         else:
