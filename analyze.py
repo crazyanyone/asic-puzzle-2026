@@ -66,7 +66,48 @@ def write_dot(
     output_path: str,
     title: str,
 ) -> None:
-    """Write a focused directed bipartite cell/net graph."""
+    """Write a focused graph with proven shift registers collapsed."""
+    shift_analysis = design.strict_shift_registers()
+    collapsed_shift_registers = [
+        shift_register
+        for shift_register in shift_analysis.shift_registers
+        if shift_register.member_instances & cell_names
+    ]
+    collapsed_members = {
+        instance
+        for shift_register in collapsed_shift_registers
+        for instance in shift_register.member_instances
+    }
+    visible_cells = cell_names - collapsed_members
+
+    # Hide nets whose functional terminals are wholly internal to one
+    # collapsed block. Boundary Q, serial, control, and reset nets remain.
+    hidden_nets: set[str] = set()
+    for net_name in net_names:
+        net = design.nets[net_name]
+        if net.is_port:
+            continue
+        terminal_instances = {
+            terminal.instance
+            for terminal in net.terminals
+            if terminal.role != "power"
+        }
+        if any(
+            terminal_instances
+            and terminal_instances <= shift_register.member_instances
+            and net_name not in shift_register.parallel_output_nets
+            and net_name
+            not in {
+                shift_register.serial_input_net,
+                shift_register.enable_net,
+                shift_register.clock_net,
+                shift_register.reset_net,
+            }
+            for shift_register in collapsed_shift_registers
+        ):
+            hidden_nets.add(net_name)
+    visible_nets = net_names - hidden_nets
+
     lines = [
         "digraph netlist {",
         "  rankdir=LR;",
@@ -76,7 +117,7 @@ def write_dot(
         f"  label={quoted(title)};",
     ]
 
-    for cell_name in sorted(cell_names, key=natural_key):
+    for cell_name in sorted(visible_cells, key=natural_key):
         instance = design.instances[cell_name]
         shape = "doubleoctagon" if instance.sequential else "box"
         label = f"{instance.name}\\n{instance.cell_type}"
@@ -85,7 +126,21 @@ def write_dot(
             f"[shape={shape}, label={quoted(label)}];"
         )
 
-    for net_name in sorted(net_names, key=natural_key):
+    for shift_register in collapsed_shift_registers:
+        touched_bits = sum(
+            q_net in visible_nets
+            for q_net in shift_register.parallel_output_nets
+        )
+        label = (
+            f"{shift_register.name}\\nShiftRegister[{shift_register.width}]"
+            f"\\n{touched_bits} visible Q bits"
+        )
+        lines.append(
+            f"  {quoted('block:' + shift_register.name)} "
+            f"[shape=box3d, label={quoted(label)}];"
+        )
+
+    for net_name in sorted(visible_nets, key=natural_key):
         net = design.nets[net_name]
         if net.is_power:
             continue
@@ -100,12 +155,12 @@ def write_dot(
             f"[shape={shape}, label={quoted(label)}];"
         )
 
-    for net_name in sorted(net_names, key=natural_key):
+    for net_name in sorted(visible_nets, key=natural_key):
         net = design.nets[net_name]
         if net.is_power:
             continue
         for terminal in net.terminals:
-            if terminal.instance not in cell_names:
+            if terminal.instance not in visible_cells:
                 continue
             cell_id = quoted("cell:" + terminal.instance)
             net_id = quoted("net:" + net_name)
@@ -118,6 +173,28 @@ def write_dot(
                 lines.append(
                     f"  {net_id} -> {cell_id} "
                     f"[label={label}, style=dashed, dir=none];"
+                )
+
+    for shift_register in collapsed_shift_registers:
+        block_id = quoted("block:" + shift_register.name)
+        input_boundaries = [
+            ("serial", shift_register.serial_input_net),
+            ("enable", shift_register.enable_net),
+            ("clock", shift_register.clock_net),
+        ]
+        if shift_register.reset_net is not None:
+            input_boundaries.append(("reset", shift_register.reset_net))
+        for role, net_name in input_boundaries:
+            if net_name in visible_nets:
+                lines.append(
+                    f"  {quoted('net:' + net_name)} -> {block_id} "
+                    f"[label={quoted(role)}];"
+                )
+        for index, q_net in enumerate(shift_register.parallel_output_nets):
+            if q_net in visible_nets:
+                lines.append(
+                    f"  {block_id} -> {quoted('net:' + q_net)} "
+                    f"[label={quoted(f'Q[{index}]')}];"
                 )
 
     lines.append("}")
