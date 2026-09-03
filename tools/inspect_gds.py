@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """List placed components (standard cells) in a GDS file.
 
-Usage:
-    python3 list_gds_components.py warmup/04_final.gds
-    python3 list_gds_components.py puzzle.gds
+Usage (from the repository root):
+    python3 -m tools.inspect_gds warmup/04_final.gds
+    python3 -m tools.inspect_gds puzzle.gds
 """
 
 from __future__ import annotations
@@ -15,9 +15,8 @@ from collections import Counter
 
 import gdstk
 
-# Sky130 pin-label layer/datatype. Signal pins live on 67/5.
-PIN_LAYER = 67
-PIN_DATATYPE = 5
+# Sky130 signal-pin label layer/texttype pairs.
+PIN_LABELS = {(67, 5), (68, 5)}
 
 FILLER_PREFIXES = (
     "sky130_fd_sc_hd__decap",
@@ -41,7 +40,7 @@ def unique_pin_labels(ref: gdstk.Reference) -> dict[str, list[tuple[float, float
     """Pin name -> chip-coordinate points (transform already applied)."""
     pins: dict[str, list[tuple[float, float]]] = {}
     for lab in ref.get_labels():
-        if lab.layer != PIN_LAYER or lab.texttype != PIN_DATATYPE:
+        if (lab.layer, lab.texttype) not in PIN_LABELS:
             continue
         pins.setdefault(lab.text, []).append((float(lab.origin[0]), float(lab.origin[1])))
     return pins
@@ -49,20 +48,26 @@ def unique_pin_labels(ref: gdstk.Reference) -> dict[str, list[tuple[float, float
 
 def iter_components(cell: gdstk.Cell):
     """Yield every direct instance placed in `cell`."""
-    for i, ref in enumerate(cell.references):
+    logic_id = 0
+    for reference_index, ref in enumerate(cell.references):
+        kind = classify(ref.cell.name)
         yield {
-            "id": i,
+            "reference_index": reference_index,
+            "instance": f"U{logic_id}" if kind == "logic" else None,
             "cell": ref.cell.name,
-            "kind": classify(ref.cell.name),
+            "kind": kind,
             "origin_um": (float(ref.origin[0]), float(ref.origin[1])),
             "rotation_rad": float(ref.rotation),
             "x_reflection": bool(ref.x_reflection),
         }
+        if kind == "logic":
+            logic_id += 1
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("gds", help="Path to a .gds file")
+    ap.add_argument("--top", help="Top-level cell name (required only if ambiguous)")
     ap.add_argument(
         "--json",
         action="store_true",
@@ -72,10 +77,26 @@ def main() -> int:
 
     lib = gdstk.read_gds(args.gds)
     tops = lib.top_level()
-    if not tops:
-        print("No top-level cell found", file=sys.stderr)
+    if args.top:
+        matches = [cell for cell in tops if cell.name == args.top]
+        if len(matches) != 1:
+            available = ", ".join(cell.name for cell in tops) or "(none)"
+            print(
+                f"Top cell {args.top!r} not found; available: {available}",
+                file=sys.stderr,
+            )
+            return 1
+        top = matches[0]
+    elif len(tops) == 1:
+        top = tops[0]
+    else:
+        available = ", ".join(cell.name for cell in tops) or "(none)"
+        print(
+            "GDS must contain exactly one top-level cell unless --top is used; "
+            f"found: {available}",
+            file=sys.stderr,
+        )
         return 1
-    top = tops[0]
     print(f"library cells: {len(lib.cells)}")
     print(f"top cell: {top.name}")
     print(f"direct instances: {len(top.references)}")
@@ -95,10 +116,10 @@ def main() -> int:
     print(f"\n{len(logic)} logic cells (first 8):")
     refs = list(top.references)
     for c in logic[:8]:
-        ref = refs[c["id"]]
+        ref = refs[c["reference_index"]]
         pins = sorted(unique_pin_labels(ref))
         print(
-            f"  U{c['id']:<4} {c['cell']:<32} "
+            f"  {c['instance']:<5} {c['cell']:<32} "
             f"@ ({c['origin_um'][0]:7.3f}, {c['origin_um'][1]:7.3f}) "
             f"refl={c['x_reflection']} pins={pins}"
         )
@@ -106,7 +127,7 @@ def main() -> int:
     if args.json:
         out = []
         for c in logic:
-            ref = refs[c["id"]]
+            ref = refs[c["reference_index"]]
             out.append({**c, "pins": unique_pin_labels(ref)})
         json.dump(out, sys.stdout, indent=2)
         print()

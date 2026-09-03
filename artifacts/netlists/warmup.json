@@ -1,0 +1,922 @@
+{
+  "schema_version": 1,
+  "source_gds": "warmup/04_final.gds",
+  "top_cell": "adder_demo",
+  "nets": {
+    "A": {
+      "aliases": [
+        "A"
+      ],
+      "terminals": [
+        "U7_mux2_1.A1"
+      ]
+    },
+    "B": {
+      "aliases": [
+        "B"
+      ],
+      "terminals": [
+        "U22_mux2_1.A1"
+      ]
+    },
+    "S": {
+      "aliases": [
+        "S"
+      ],
+      "terminals": [
+        "U53_and4bb_2.X"
+      ]
+    },
+    "VGND": {
+      "aliases": [
+        "VGND"
+      ],
+      "terminals": [
+        "U0_clkbuf_16.VGND",
+        "U10_dfrtp_2.VGND",
+        "U11_dfrtp_2.VGND",
+        "U12_dfrtp_2.VGND",
+        "U13_dfrtp_2.VGND",
+        "U14_mux2_1.VGND",
+        "U15_mux2_1.VGND",
+        "U16_mux2_1.VGND",
+        "U17_mux2_1.VGND",
+        "U18_dfrtp_2.VGND",
+        "U19_dfrtp_2.VGND",
+        "U1_and4bb_2.VGND",
+        "U20_mux2_1.VGND",
+        "U21_mux2_1.VGND",
+        "U22_mux2_1.VGND",
+        "U23_dfrtp_2.VGND",
+        "U24_dfrtp_2.VGND",
+        "U25_dfrtp_2.VGND",
+        "U26_dfrtp_2.VGND",
+        "U27_mux2_1.VGND",
+        "U28_mux2_1.VGND",
+        "U29_mux2_1.VGND",
+        "U2_and3_2.VGND",
+        "U30_dfrtp_2.VGND",
+        "U31_clkbuf_16.VGND",
+        "U32_dfrtp_2.VGND",
+        "U33_dfrtp_2.VGND",
+        "U34_dfrtp_2.VGND",
+        "U35_mux2_1.VGND",
+        "U36_mux2_1.VGND",
+        "U37_a31o_2.VGND",
+        "U38_nor2_2.VGND",
+        "U39_nor2_2.VGND",
+        "U3_clkbuf_16.VGND",
+        "U40_nor2_2.VGND",
+        "U41_nor2_2.VGND",
+        "U42_a21boi_2.VGND",
+        "U43_o21bai_2.VGND",
+        "U44_and2_2.VGND",
+        "U45_and2_2.VGND",
+        "U46_xor2_2.VGND",
+        "U47_xor2_2.VGND",
+        "U48_xor2_2.VGND",
+        "U49_xor2_2.VGND",
+        "U4_mux2_1.VGND",
+        "U50_a31o_2.VGND",
+        "U51_or2_2.VGND",
+        "U52_and2_2.VGND",
+        "U53_and4bb_2.VGND",
+        "U54_or2_2.VGND",
+        "U55_a21bo_2.VGND",
+        "U56_and2_2.VGND",
+        "U57_nor2_2.VGND",
+        "U58_nor2_2.VGND",
+        "U59_a21o_2.VGND",
+        "U5_mux2_1.VGND",
+        "U60_or2_2.VGND",
+        "U61_nor2_2.VGND",
+        "U62_nand2_2.VGND",
+        "U63_and2_2.VGND",
+        "U64_a31o_2.VGND",
+        "U65_or2_2.VGND",
+        "U66_xnor2_2.VGND",
+        "U67_a31o_2.VGND",
+        "U68_xor2_2.VGND",
+        "U69_xnor2_2.VGND",
+        "U6_mux2_1.VGND",
+        "U70_nand2_2.VGND",
+        "U71_nand2_2.VGND",
+        "U72_nor2_2.VGND",
+        "U73_nand2_2.VGND",
+        "U74_and2_2.VGND",
+        "U75_a31o_2.VGND",
+        "U76_xnor2_2.VGND",
+        "U77_or2_2.VGND",
+        "U78_and2_2.VGND",
+        "U7_mux2_1.VGND",
+        "U8_dfrtp_2.VGND",
+        "U9_dfrtp_2.VGND"
+      ]
+    },
+    "VPWR": {
+      "aliases": [
+        "VPWR"
+      ],
+      "terminals": [
+        "U0_clkbuf_16.VPWR",
+        "U10_dfrtp_2.VPWR",
+        "U11_dfrtp_2.VPWR",
+        "U12_dfrtp_2.VPWR",
+        "U13_dfrtp_2.VPWR",
+        "U14_mux2_1.VPWR",
+        "U15_mux2_1.VPWR",
+        "U16_mux2_1.VPWR",
+        "U17_mux2_1.VPWR",
+        "U18_dfrtp_2.VPWR",
+        "U19_dfrtp_2.VPWR",
+        "U1_and4bb_2.VPWR",
+        "U20_mux2_1.VPWR",
+        "U21_mux2_1.VPWR",
+        "U22_mux2_1.VPWR",
+        "U23_dfrtp_2.VPWR",
+        "U24_dfrtp_2.VPWR",
+        "U25_dfrtp_2.VPWR",
+        "U26_dfrtp_2.VPWR",
+        "U27_mux2_1.VPWR",
+        "U28_mux2_1.VPWR",
+        "U29_mux2_1.VPWR",
+        "U2_and3_2.VPWR",
+        "U30_dfrtp_2.VPWR",
+        "U31_clkbuf_16.VPWR",
+        "U32_dfrtp_2.VPWR",
+        "U33_dfrtp_2.VPWR",
+        "U34_dfrtp_2.VPWR",
+        "U35_mux2_1.VPWR",
+        "U36_mux2_1.VPWR",
+        "U37_a31o_2.VPWR",
+        "U38_nor2_2.VPWR",
+        "U39_nor2_2.VPWR",
+        "U3_clkbuf_16.VPWR",
+        "U40_nor2_2.VPWR",
+        "U41_nor2_2.VPWR",
+        "U42_a21boi_2.VPWR",
+        "U43_o21bai_2.VPWR",
+        "U44_and2_2.VPWR",
+        "U45_and2_2.VPWR",
+        "U46_xor2_2.VPWR",
+        "U47_xor2_2.VPWR",
+        "U48_xor2_2.VPWR",
+        "U49_xor2_2.VPWR",
+        "U4_mux2_1.VPWR",
+        "U50_a31o_2.VPWR",
+        "U51_or2_2.VPWR",
+        "U52_and2_2.VPWR",
+        "U53_and4bb_2.VPWR",
+        "U54_or2_2.VPWR",
+        "U55_a21bo_2.VPWR",
+        "U56_and2_2.VPWR",
+        "U57_nor2_2.VPWR",
+        "U58_nor2_2.VPWR",
+        "U59_a21o_2.VPWR",
+        "U5_mux2_1.VPWR",
+        "U60_or2_2.VPWR",
+        "U61_nor2_2.VPWR",
+        "U62_nand2_2.VPWR",
+        "U63_and2_2.VPWR",
+        "U64_a31o_2.VPWR",
+        "U65_or2_2.VPWR",
+        "U66_xnor2_2.VPWR",
+        "U67_a31o_2.VPWR",
+        "U68_xor2_2.VPWR",
+        "U69_xnor2_2.VPWR",
+        "U6_mux2_1.VPWR",
+        "U70_nand2_2.VPWR",
+        "U71_nand2_2.VPWR",
+        "U72_nor2_2.VPWR",
+        "U73_nand2_2.VPWR",
+        "U74_and2_2.VPWR",
+        "U75_a31o_2.VPWR",
+        "U76_xnor2_2.VPWR",
+        "U77_or2_2.VPWR",
+        "U78_and2_2.VPWR",
+        "U7_mux2_1.VPWR",
+        "U8_dfrtp_2.VPWR",
+        "U9_dfrtp_2.VPWR"
+      ]
+    },
+    "clk": {
+      "aliases": [
+        "clk"
+      ],
+      "terminals": [
+        "U0_clkbuf_16.A"
+      ]
+    },
+    "en": {
+      "aliases": [
+        "en"
+      ],
+      "terminals": [
+        "U14_mux2_1.S",
+        "U15_mux2_1.S",
+        "U16_mux2_1.S",
+        "U17_mux2_1.S",
+        "U20_mux2_1.S",
+        "U21_mux2_1.S",
+        "U22_mux2_1.S",
+        "U27_mux2_1.S",
+        "U28_mux2_1.S",
+        "U29_mux2_1.S",
+        "U35_mux2_1.S",
+        "U36_mux2_1.S",
+        "U4_mux2_1.S",
+        "U5_mux2_1.S",
+        "U6_mux2_1.S",
+        "U7_mux2_1.S"
+      ]
+    },
+    "rst_n": {
+      "aliases": [
+        "rst_n"
+      ],
+      "terminals": [
+        "U10_dfrtp_2.RESET_B",
+        "U11_dfrtp_2.RESET_B",
+        "U12_dfrtp_2.RESET_B",
+        "U13_dfrtp_2.RESET_B",
+        "U18_dfrtp_2.RESET_B",
+        "U19_dfrtp_2.RESET_B",
+        "U23_dfrtp_2.RESET_B",
+        "U24_dfrtp_2.RESET_B",
+        "U25_dfrtp_2.RESET_B",
+        "U26_dfrtp_2.RESET_B",
+        "U30_dfrtp_2.RESET_B",
+        "U32_dfrtp_2.RESET_B",
+        "U33_dfrtp_2.RESET_B",
+        "U34_dfrtp_2.RESET_B",
+        "U8_dfrtp_2.RESET_B",
+        "U9_dfrtp_2.RESET_B"
+      ]
+    },
+    "n0000": {
+      "aliases": [],
+      "terminals": [
+        "U0_clkbuf_16.X",
+        "U31_clkbuf_16.A",
+        "U3_clkbuf_16.A"
+      ]
+    },
+    "n0001": {
+      "aliases": [],
+      "terminals": [
+        "U10_dfrtp_2.CLK",
+        "U11_dfrtp_2.CLK",
+        "U12_dfrtp_2.CLK",
+        "U13_dfrtp_2.CLK",
+        "U18_dfrtp_2.CLK",
+        "U19_dfrtp_2.CLK",
+        "U3_clkbuf_16.X",
+        "U8_dfrtp_2.CLK",
+        "U9_dfrtp_2.CLK"
+      ]
+    },
+    "n0002": {
+      "aliases": [],
+      "terminals": [
+        "U10_dfrtp_2.D",
+        "U4_mux2_1.X"
+      ]
+    },
+    "n0003": {
+      "aliases": [],
+      "terminals": [
+        "U10_dfrtp_2.Q",
+        "U39_nor2_2.B",
+        "U4_mux2_1.A0",
+        "U56_and2_2.B",
+        "U5_mux2_1.A1",
+        "U65_or2_2.B"
+      ]
+    },
+    "n0004": {
+      "aliases": [],
+      "terminals": [
+        "U11_dfrtp_2.D",
+        "U15_mux2_1.X"
+      ]
+    },
+    "n0005": {
+      "aliases": [],
+      "terminals": [
+        "U11_dfrtp_2.Q",
+        "U15_mux2_1.A0",
+        "U37_a31o_2.A2",
+        "U4_mux2_1.A1",
+        "U54_or2_2.B",
+        "U71_nand2_2.B"
+      ]
+    },
+    "n0006": {
+      "aliases": [],
+      "terminals": [
+        "U12_dfrtp_2.D",
+        "U7_mux2_1.X"
+      ]
+    },
+    "n0007": {
+      "aliases": [],
+      "terminals": [
+        "U12_dfrtp_2.Q",
+        "U17_mux2_1.A1",
+        "U73_nand2_2.B",
+        "U75_a31o_2.A2",
+        "U77_or2_2.B",
+        "U7_mux2_1.A0"
+      ]
+    },
+    "n0008": {
+      "aliases": [],
+      "terminals": [
+        "U13_dfrtp_2.D",
+        "U6_mux2_1.X"
+      ]
+    },
+    "n0009": {
+      "aliases": [],
+      "terminals": [
+        "U13_dfrtp_2.Q",
+        "U16_mux2_1.A1",
+        "U51_or2_2.B",
+        "U6_mux2_1.A0",
+        "U70_nand2_2.B"
+      ]
+    },
+    "n0010": {
+      "aliases": [],
+      "terminals": [
+        "U14_mux2_1.A0",
+        "U40_nor2_2.B",
+        "U52_and2_2.B",
+        "U60_or2_2.B",
+        "U6_mux2_1.A1",
+        "U8_dfrtp_2.Q"
+      ]
+    },
+    "n0011": {
+      "aliases": [],
+      "terminals": [
+        "U14_mux2_1.A1",
+        "U5_mux2_1.A0",
+        "U61_nor2_2.B",
+        "U64_a31o_2.A2",
+        "U78_and2_2.B",
+        "U9_dfrtp_2.Q"
+      ]
+    },
+    "n0012": {
+      "aliases": [],
+      "terminals": [
+        "U14_mux2_1.X",
+        "U8_dfrtp_2.D"
+      ]
+    },
+    "n0013": {
+      "aliases": [],
+      "terminals": [
+        "U15_mux2_1.A1",
+        "U17_mux2_1.A0",
+        "U19_dfrtp_2.Q",
+        "U46_xor2_2.B",
+        "U63_and2_2.B"
+      ]
+    },
+    "n0014": {
+      "aliases": [],
+      "terminals": [
+        "U16_mux2_1.A0",
+        "U18_dfrtp_2.Q",
+        "U38_nor2_2.B",
+        "U45_and2_2.B"
+      ]
+    },
+    "n0015": {
+      "aliases": [],
+      "terminals": [
+        "U16_mux2_1.X",
+        "U18_dfrtp_2.D"
+      ]
+    },
+    "n0016": {
+      "aliases": [],
+      "terminals": [
+        "U17_mux2_1.X",
+        "U19_dfrtp_2.D"
+      ]
+    },
+    "n0017": {
+      "aliases": [],
+      "terminals": [
+        "U1_and4bb_2.A_N",
+        "U68_xor2_2.X"
+      ]
+    },
+    "n0018": {
+      "aliases": [],
+      "terminals": [
+        "U1_and4bb_2.B_N",
+        "U49_xor2_2.X"
+      ]
+    },
+    "n0019": {
+      "aliases": [],
+      "terminals": [
+        "U1_and4bb_2.C",
+        "U48_xor2_2.X"
+      ]
+    },
+    "n0020": {
+      "aliases": [],
+      "terminals": [
+        "U1_and4bb_2.D",
+        "U47_xor2_2.X"
+      ]
+    },
+    "n0021": {
+      "aliases": [],
+      "terminals": [
+        "U1_and4bb_2.X",
+        "U53_and4bb_2.D"
+      ]
+    },
+    "n0022": {
+      "aliases": [],
+      "terminals": [
+        "U20_mux2_1.A0",
+        "U26_dfrtp_2.Q",
+        "U36_mux2_1.A1",
+        "U37_a31o_2.A1",
+        "U54_or2_2.A",
+        "U71_nand2_2.A"
+      ]
+    },
+    "n0023": {
+      "aliases": [],
+      "terminals": [
+        "U20_mux2_1.A1",
+        "U21_mux2_1.A0",
+        "U30_dfrtp_2.Q",
+        "U46_xor2_2.A",
+        "U63_and2_2.A"
+      ]
+    },
+    "n0024": {
+      "aliases": [],
+      "terminals": [
+        "U20_mux2_1.X",
+        "U26_dfrtp_2.D"
+      ]
+    },
+    "n0025": {
+      "aliases": [],
+      "terminals": [
+        "U21_mux2_1.A1",
+        "U22_mux2_1.A0",
+        "U33_dfrtp_2.Q",
+        "U73_nand2_2.A",
+        "U75_a31o_2.A1",
+        "U77_or2_2.A"
+      ]
+    },
+    "n0026": {
+      "aliases": [],
+      "terminals": [
+        "U21_mux2_1.X",
+        "U30_dfrtp_2.D"
+      ]
+    },
+    "n0027": {
+      "aliases": [],
+      "terminals": [
+        "U22_mux2_1.X",
+        "U33_dfrtp_2.D"
+      ]
+    },
+    "n0028": {
+      "aliases": [],
+      "terminals": [
+        "U23_dfrtp_2.CLK",
+        "U24_dfrtp_2.CLK",
+        "U25_dfrtp_2.CLK",
+        "U26_dfrtp_2.CLK",
+        "U30_dfrtp_2.CLK",
+        "U31_clkbuf_16.X",
+        "U32_dfrtp_2.CLK",
+        "U33_dfrtp_2.CLK",
+        "U34_dfrtp_2.CLK"
+      ]
+    },
+    "n0029": {
+      "aliases": [],
+      "terminals": [
+        "U23_dfrtp_2.D",
+        "U29_mux2_1.X"
+      ]
+    },
+    "n0030": {
+      "aliases": [],
+      "terminals": [
+        "U23_dfrtp_2.Q",
+        "U27_mux2_1.A1",
+        "U29_mux2_1.A0",
+        "U51_or2_2.A",
+        "U70_nand2_2.A"
+      ]
+    },
+    "n0031": {
+      "aliases": [],
+      "terminals": [
+        "U24_dfrtp_2.D",
+        "U36_mux2_1.X"
+      ]
+    },
+    "n0032": {
+      "aliases": [],
+      "terminals": [
+        "U24_dfrtp_2.Q",
+        "U28_mux2_1.A1",
+        "U36_mux2_1.A0",
+        "U39_nor2_2.A",
+        "U56_and2_2.A",
+        "U65_or2_2.A"
+      ]
+    },
+    "n0033": {
+      "aliases": [],
+      "terminals": [
+        "U25_dfrtp_2.D",
+        "U27_mux2_1.X"
+      ]
+    },
+    "n0034": {
+      "aliases": [],
+      "terminals": [
+        "U25_dfrtp_2.Q",
+        "U27_mux2_1.A0",
+        "U38_nor2_2.A",
+        "U45_and2_2.A"
+      ]
+    },
+    "n0035": {
+      "aliases": [],
+      "terminals": [
+        "U28_mux2_1.A0",
+        "U34_dfrtp_2.Q",
+        "U35_mux2_1.A1",
+        "U61_nor2_2.A",
+        "U64_a31o_2.A1",
+        "U78_and2_2.A"
+      ]
+    },
+    "n0036": {
+      "aliases": [],
+      "terminals": [
+        "U28_mux2_1.X",
+        "U34_dfrtp_2.D"
+      ]
+    },
+    "n0037": {
+      "aliases": [],
+      "terminals": [
+        "U29_mux2_1.A1",
+        "U32_dfrtp_2.Q",
+        "U35_mux2_1.A0",
+        "U40_nor2_2.A",
+        "U52_and2_2.A",
+        "U60_or2_2.A"
+      ]
+    },
+    "n0038": {
+      "aliases": [],
+      "terminals": [
+        "U2_and3_2.A",
+        "U66_xnor2_2.Y"
+      ]
+    },
+    "n0039": {
+      "aliases": [],
+      "terminals": [
+        "U2_and3_2.B",
+        "U69_xnor2_2.Y"
+      ]
+    },
+    "n0040": {
+      "aliases": [],
+      "terminals": [
+        "U2_and3_2.C",
+        "U43_o21bai_2.Y"
+      ]
+    },
+    "n0041": {
+      "aliases": [],
+      "terminals": [
+        "U2_and3_2.X",
+        "U53_and4bb_2.C"
+      ]
+    },
+    "n0042": {
+      "aliases": [],
+      "terminals": [
+        "U32_dfrtp_2.D",
+        "U35_mux2_1.X"
+      ]
+    },
+    "n0043": {
+      "aliases": [],
+      "terminals": [
+        "U37_a31o_2.A3",
+        "U65_or2_2.X"
+      ]
+    },
+    "n0044": {
+      "aliases": [],
+      "terminals": [
+        "U37_a31o_2.B1",
+        "U56_and2_2.X",
+        "U58_nor2_2.B"
+      ]
+    },
+    "n0045": {
+      "aliases": [],
+      "terminals": [
+        "U37_a31o_2.X",
+        "U67_a31o_2.B1"
+      ]
+    },
+    "n0046": {
+      "aliases": [],
+      "terminals": [
+        "U38_nor2_2.Y",
+        "U43_o21bai_2.A1",
+        "U72_nor2_2.B"
+      ]
+    },
+    "n0047": {
+      "aliases": [],
+      "terminals": [
+        "U39_nor2_2.Y",
+        "U58_nor2_2.A"
+      ]
+    },
+    "n0048": {
+      "aliases": [],
+      "terminals": [
+        "U40_nor2_2.Y",
+        "U57_nor2_2.A"
+      ]
+    },
+    "n0049": {
+      "aliases": [],
+      "terminals": [
+        "U41_nor2_2.A",
+        "U59_a21o_2.B1",
+        "U78_and2_2.X"
+      ]
+    },
+    "n0050": {
+      "aliases": [],
+      "terminals": [
+        "U41_nor2_2.B",
+        "U61_nor2_2.Y"
+      ]
+    },
+    "n0051": {
+      "aliases": [],
+      "terminals": [
+        "U41_nor2_2.Y",
+        "U48_xor2_2.A",
+        "U50_a31o_2.A1",
+        "U59_a21o_2.A1"
+      ]
+    },
+    "n0052": {
+      "aliases": [],
+      "terminals": [
+        "U42_a21boi_2.A1",
+        "U51_or2_2.X",
+        "U62_nand2_2.B"
+      ]
+    },
+    "n0053": {
+      "aliases": [],
+      "terminals": [
+        "U42_a21boi_2.A2",
+        "U50_a31o_2.X",
+        "U66_xnor2_2.B"
+      ]
+    },
+    "n0054": {
+      "aliases": [],
+      "terminals": [
+        "U42_a21boi_2.B1_N",
+        "U62_nand2_2.A",
+        "U70_nand2_2.Y"
+      ]
+    },
+    "n0055": {
+      "aliases": [],
+      "terminals": [
+        "U42_a21boi_2.Y",
+        "U43_o21bai_2.A2",
+        "U69_xnor2_2.B"
+      ]
+    },
+    "n0056": {
+      "aliases": [],
+      "terminals": [
+        "U43_o21bai_2.B1_N",
+        "U45_and2_2.X",
+        "U72_nor2_2.A"
+      ]
+    },
+    "n0057": {
+      "aliases": [],
+      "terminals": [
+        "U44_and2_2.A",
+        "U73_nand2_2.Y",
+        "U76_xnor2_2.A"
+      ]
+    },
+    "n0058": {
+      "aliases": [],
+      "terminals": [
+        "U44_and2_2.B",
+        "U77_or2_2.X"
+      ]
+    },
+    "n0059": {
+      "aliases": [],
+      "terminals": [
+        "U44_and2_2.X",
+        "U53_and4bb_2.B_N"
+      ]
+    },
+    "n0060": {
+      "aliases": [],
+      "terminals": [
+        "U46_xor2_2.X",
+        "U75_a31o_2.A3",
+        "U76_xnor2_2.B"
+      ]
+    },
+    "n0061": {
+      "aliases": [],
+      "terminals": [
+        "U47_xor2_2.A",
+        "U50_a31o_2.A3",
+        "U57_nor2_2.Y"
+      ]
+    },
+    "n0062": {
+      "aliases": [],
+      "terminals": [
+        "U47_xor2_2.B",
+        "U59_a21o_2.X"
+      ]
+    },
+    "n0063": {
+      "aliases": [],
+      "terminals": [
+        "U48_xor2_2.B",
+        "U50_a31o_2.A2",
+        "U59_a21o_2.A2",
+        "U67_a31o_2.X"
+      ]
+    },
+    "n0064": {
+      "aliases": [],
+      "terminals": [
+        "U49_xor2_2.A",
+        "U55_a21bo_2.A1",
+        "U67_a31o_2.A1",
+        "U75_a31o_2.X"
+      ]
+    },
+    "n0065": {
+      "aliases": [],
+      "terminals": [
+        "U49_xor2_2.B",
+        "U55_a21bo_2.A2",
+        "U67_a31o_2.A2",
+        "U74_and2_2.X"
+      ]
+    },
+    "n0066": {
+      "aliases": [],
+      "terminals": [
+        "U50_a31o_2.B1",
+        "U64_a31o_2.X"
+      ]
+    },
+    "n0067": {
+      "aliases": [],
+      "terminals": [
+        "U52_and2_2.X",
+        "U57_nor2_2.B",
+        "U64_a31o_2.B1"
+      ]
+    },
+    "n0068": {
+      "aliases": [],
+      "terminals": [
+        "U53_and4bb_2.A_N",
+        "U76_xnor2_2.Y"
+      ]
+    },
+    "n0069": {
+      "aliases": [],
+      "terminals": [
+        "U54_or2_2.X",
+        "U74_and2_2.A"
+      ]
+    },
+    "n0070": {
+      "aliases": [],
+      "terminals": [
+        "U55_a21bo_2.B1_N",
+        "U71_nand2_2.Y",
+        "U74_and2_2.B"
+      ]
+    },
+    "n0071": {
+      "aliases": [],
+      "terminals": [
+        "U55_a21bo_2.X",
+        "U68_xor2_2.B"
+      ]
+    },
+    "n0072": {
+      "aliases": [],
+      "terminals": [
+        "U58_nor2_2.Y",
+        "U67_a31o_2.A3",
+        "U68_xor2_2.A"
+      ]
+    },
+    "n0073": {
+      "aliases": [],
+      "terminals": [
+        "U5_mux2_1.X",
+        "U9_dfrtp_2.D"
+      ]
+    },
+    "n0074": {
+      "aliases": [],
+      "terminals": [
+        "U60_or2_2.X",
+        "U64_a31o_2.A3"
+      ]
+    },
+    "n0075": {
+      "aliases": [],
+      "terminals": [
+        "U62_nand2_2.Y",
+        "U66_xnor2_2.A"
+      ]
+    },
+    "n0076": {
+      "aliases": [],
+      "terminals": [
+        "U63_and2_2.X",
+        "U75_a31o_2.B1"
+      ]
+    },
+    "n0077": {
+      "aliases": [],
+      "terminals": [
+        "U69_xnor2_2.A",
+        "U72_nor2_2.Y"
+      ]
+    }
+  },
+  "diagnostics": {
+    "unresolved_pins": [],
+    "unresolved_ports": [],
+    "via_cuts": {
+      "li1->met1": {
+        "total": 2718,
+        "stitched": 2718
+      },
+      "met1->met2": {
+        "total": 763,
+        "stitched": 763
+      },
+      "met2->met3": {
+        "total": 420,
+        "stitched": 420
+      },
+      "met3->met4": {
+        "total": 380,
+        "stitched": 380
+      },
+      "met4->met5": {
+        "total": 13,
+        "stitched": 13
+      }
+    }
+  }
+}

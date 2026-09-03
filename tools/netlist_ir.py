@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Semantic, queryable representation of an extracted standard-cell netlist.
 
-The extractor's JSON is deliberately simple: net name -> ["instance.pin", ...].
-This module keeps that representation as the source of truth and derives:
+The extractor's JSON is deliberately simple: each net has an id, optional
+top-level aliases, and a list of ``instance.pin`` terminals. This module keeps
+that representation as the source of truth and derives:
 
 * an instance -> pin -> net index;
 * terminal direction and role from a small Sky130 cell dictionary;
@@ -17,7 +18,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Iterable
 
@@ -34,8 +35,19 @@ class CellModel:
     reset_pins: tuple[str, ...] = ()
     set_pins: tuple[str, ...] = ()
     function: str = ""
+    output_functions: tuple[tuple[str, str], ...] = ()
+    clocked_on: str | None = None
+    next_state: str | None = None
+    clear: str | None = None
+    preset: str | None = None
     sequential: bool = False
     known: bool = True
+
+    def output_expression(self, pin: str) -> str:
+        functions = dict(self.output_functions)
+        if pin not in functions:
+            raise KeyError(f"No output function for {self.name}.{pin}")
+        return functions[pin]
 
     def pin_direction(self, pin: str) -> str:
         if pin in POWER_PINS:
@@ -89,8 +101,10 @@ def _const(name: str, outputs: Iterable[str], function: str) -> CellModel:
     )
 
 
-# This intentionally covers the warm-up and common Sky130-HD combinational
-# cells. Add models from the official PDK as new cell types are encountered.
+# These readable declarations are assertions about the expected cell subset,
+# not the runtime source of Boolean behavior.  The loader below checks every
+# pin/control role, then replaces every function and state equation with the
+# checked-in official Liberty snapshot.  A mismatch fails at import time.
 CELL_MODELS: dict[str, CellModel] = {
     "buf": _comb("buf", ("A",), "X", "X = A"),
     "clkbuf": _comb("clkbuf", ("A",), "X", "X = A"),
@@ -313,6 +327,72 @@ CELL_MODELS: dict[str, CellModel] = {
 }
 
 
+def _apply_official_model_snapshot(
+    models: dict[str, CellModel],
+) -> tuple[dict[str, CellModel], dict[str, object]]:
+    """Validate pin metadata and replace behavior with official Liberty data."""
+    path = Path(__file__).with_name("sky130_hd_cells.json")
+    raw = json.loads(path.read_text())
+    official = raw.get("cells")
+    if not isinstance(official, dict):
+        raise RuntimeError(f"Invalid cell-model snapshot: {path}")
+    if set(models) != set(official):
+        raise RuntimeError(
+            "Cell-model table and official snapshot disagree: "
+            f"table_only={sorted(set(models) - set(official))}, "
+            f"snapshot_only={sorted(set(official) - set(models))}"
+        )
+
+    validated: dict[str, CellModel] = {}
+    for name, model in models.items():
+        record = official[name]
+        output_functions = record["outputs"]
+        expected = {
+            "inputs": set(model.inputs),
+            "outputs": set(model.outputs),
+            "clock_pins": set(model.clock_pins),
+            "reset_pins": set(model.reset_pins),
+            "set_pins": set(model.set_pins),
+        }
+        observed = {
+            "inputs": set(record["inputs"]),
+            "outputs": set(output_functions),
+            "clock_pins": set(record["clock_pins"]),
+            "reset_pins": set(record["reset_pins"]),
+            "set_pins": set(record["set_pins"]),
+        }
+        if expected != observed or model.sequential != record["sequential"]:
+            raise RuntimeError(
+                f"Hand-written metadata disagrees with official model for {name}: "
+                f"expected={expected}, observed={observed}"
+            )
+        equations = "; ".join(
+            f"{pin} = {expression}"
+            for pin, expression in sorted(output_functions.items())
+        )
+        description = record["description"]
+        function = f"{description} {equations}" if equations else description
+        validated[name] = replace(
+            model,
+            inputs=tuple(record["inputs"]),
+            outputs=tuple(output_functions),
+            clock_pins=tuple(record["clock_pins"]),
+            reset_pins=tuple(record["reset_pins"]),
+            set_pins=tuple(record["set_pins"]),
+            function=function,
+            output_functions=tuple(sorted(output_functions.items())),
+            clocked_on=record["clocked_on"],
+            next_state=record["next_state"],
+            clear=record["clear"],
+            preset=record["preset"],
+            sequential=record["sequential"],
+        )
+    return validated, raw
+
+
+CELL_MODELS, CELL_MODEL_PROVENANCE = _apply_official_model_snapshot(CELL_MODELS)
+
+
 def infer_cell_type(instance_name: str) -> str:
     """Find a known cell token near the end of a synthetic instance name."""
     without_drive = re.sub(r"_\d+$", "", instance_name)
@@ -386,12 +466,12 @@ class Net:
             return "internal"
         if self.is_power:
             return "power"
-        if not self.drivers and self.loads:
-            return "input"
-        if self.drivers and not self.loads:
+        # Internal fan-out from an output net is normal and does not make the
+        # top-level port bidirectional. A cell driver is the decisive evidence.
+        if self.drivers:
             return "output"
-        if self.drivers and self.loads:
-            return "inout-or-aliased"
+        if self.loads:
+            return "input"
         return "unknown"
 
 
@@ -421,6 +501,7 @@ class ShiftRegister:
     serial_input_net: str
     enable_net: str
     clock_net: str
+    clock_leaf_nets: tuple[str, ...]
     reset_net: str | None
     parallel_output_nets: tuple[str, ...]
     external_q_loads: dict[str, tuple[str, ...]]
@@ -472,14 +553,45 @@ class Design:
         with source.open() as fh:
             raw = json.load(fh)
         if not isinstance(raw, dict):
-            raise ValueError("Expected a JSON object mapping nets to terminal lists")
+            raise ValueError("Expected a JSON object containing extracted nets")
+
+        # Schema v1 records port aliases explicitly. The legacy format was a
+        # bare net-name -> terminal-list mapping and inferred ports from names.
+        schema_v1 = raw.get("schema_version") == 1
+        if schema_v1:
+            raw_nets = raw.get("nets")
+            if not isinstance(raw_nets, dict):
+                raise ValueError("Schema v1 requires a 'nets' object")
+        else:
+            raw_nets = raw
 
         pin_maps: dict[str, dict[str, str]] = {}
         net_terms: dict[str, list[tuple[str, str]]] = {}
+        net_aliases: dict[str, tuple[str, ...]] = {}
 
-        for net_name, terminal_names in raw.items():
-            if not isinstance(net_name, str) or not isinstance(terminal_names, list):
-                raise ValueError("Each net must map from a string to a list")
+        for net_name, record in raw_nets.items():
+            if not isinstance(net_name, str):
+                raise ValueError("Each net id must be a string")
+            if schema_v1:
+                if not isinstance(record, dict):
+                    raise ValueError(f"Net {net_name!r} must be an object")
+                terminal_names = record.get("terminals")
+                aliases = record.get("aliases")
+                if not isinstance(terminal_names, list) or not isinstance(aliases, list):
+                    raise ValueError(
+                        f"Net {net_name!r} requires 'terminals' and 'aliases' lists"
+                    )
+                if not all(isinstance(alias, str) for alias in aliases):
+                    raise ValueError(f"Net {net_name!r} has a non-string alias")
+                net_aliases[net_name] = tuple(aliases)
+            else:
+                terminal_names = record
+                is_internal = net_name.startswith("(")
+                net_aliases[net_name] = (
+                    () if is_internal else tuple(net_name.split("|"))
+                )
+            if not isinstance(terminal_names, list):
+                raise ValueError(f"Net {net_name!r} terminals must be a list")
             net_terms[net_name] = []
             for terminal_name in terminal_names:
                 if not isinstance(terminal_name, str) or "." not in terminal_name:
@@ -507,12 +619,11 @@ class Design:
         terminals: dict[str, Terminal] = {}
         nets: dict[str, Net] = {}
         for net_name, members in net_terms.items():
-            aliases = tuple(net_name.split("|"))
-            is_internal = net_name.startswith("(")
+            aliases = net_aliases[net_name]
             net = Net(
                 name=net_name,
                 aliases=aliases,
-                is_port=not is_internal,
+                is_port=bool(aliases),
                 is_power=any(alias in POWER_PINS for alias in aliases),
             )
             nets[net_name] = net
@@ -574,6 +685,28 @@ class Design:
         drivers = self.nets[net_name].drivers
         return drivers[0] if len(drivers) == 1 else None
 
+    def transparent_source_net(
+        self,
+        net_name: str,
+        cell_types: frozenset[str] = frozenset({"buf", "clkbuf"}),
+    ) -> str:
+        """Walk backward through one-input transparent buffers."""
+        seen: set[str] = set()
+        while net_name not in seen:
+            seen.add(net_name)
+            driver = self.driver_of(net_name)
+            if driver is None:
+                return net_name
+            instance = self.instances[driver.instance]
+            if (
+                instance.cell_type not in cell_types
+                or driver.pin not in instance.model.outputs
+                or "A" not in instance.pins
+            ):
+                return net_name
+            net_name = instance.pins["A"].net
+        return net_name
+
     def source_description(self, net_name: str) -> str:
         net = self.nets[net_name]
         if net.is_port and net.inferred_direction == "input":
@@ -607,6 +740,7 @@ class Design:
                 not net.is_port
                 and not net.drivers
                 and net.loads
+                and not net.name.startswith("unresolved_")
                 and not net.name.startswith("('UNRESOLVED'")
             ):
                 issues.append(f"undriven internal net {net.name}")
@@ -641,6 +775,32 @@ class Design:
                 net = self.nets[terminal.net]
                 if any(member.instance in cells for member in net.terminals):
                     nets.add(net.name)
+        return cells, nets
+
+    def net_neighborhood(
+        self, net_name: str, radius: int = 1
+    ) -> tuple[set[str], set[str]]:
+        """Return the bipartite neighborhood starting from a net."""
+        start = self.resolve_net(net_name).name
+        nets = {start}
+        frontier = {start}
+        cells: set[str] = set()
+
+        for _ in range(max(radius, 0)):
+            next_frontier: set[str] = set()
+            for current_net in frontier:
+                for terminal in self.nets[current_net].terminals:
+                    if terminal.role == "power":
+                        continue
+                    cells.add(terminal.instance)
+                    for neighbor in self.signal_terminals(
+                        self.instances[terminal.instance]
+                    ):
+                        if not self.nets[neighbor.net].is_power:
+                            next_frontier.add(neighbor.net)
+            next_frontier -= nets
+            nets.update(next_frontier)
+            frontier = next_frontier
         return cells, nets
 
     def backward_cone(
@@ -751,7 +911,8 @@ class Design:
         * the mux has exactly A0/A1/S/X and exactly one data input is own Q;
         * Q has exactly one driver, the stage's Q pin;
         * stages form one unbranched, acyclic, multi-stage chain;
-        * all stages share clock, reset, enable, and mux orientation;
+        * all stages share a clock source (buffer leaves may differ), reset,
+          enable, and mux orientation;
         * loads on muxes inside the abstraction exactly match the expected
           self-hold and next-stage serial connections.
 
@@ -778,6 +939,7 @@ class Design:
                 + flip_flop.model.outputs
                 + flip_flop.model.clock_pins
                 + flip_flop.model.reset_pins
+                + flip_flop.model.set_pins
             )
             actual_ff_pins = {
                 terminal.pin for terminal in self.signal_terminals(flip_flop)
@@ -790,6 +952,11 @@ class Design:
                 )
             if "D" not in flip_flop.pins or "Q" not in flip_flop.pins:
                 reasons.append("flip-flop does not expose both D and Q")
+            if flip_flop.model.set_pins:
+                reasons.append(
+                    "asynchronous-set flip-flops are not supported by this "
+                    "shift-register abstraction"
+                )
 
             mux: Instance | None = None
             hold_pin = ""
@@ -994,7 +1161,8 @@ class Design:
                 enable_nets = {stage.select_net for stage in ordered_stages}
                 hold_pins = {stage.hold_pin for stage in ordered_stages}
                 data_pins = {stage.data_pin for stage in ordered_stages}
-                clock_nets: set[str] = set()
+                clock_leaf_nets: set[str] = set()
+                clock_source_nets: set[str] = set()
                 reset_nets: set[str | None] = set()
 
                 for stage in ordered_stages:
@@ -1014,7 +1182,10 @@ class Design:
                             f"{stage.flip_flop} does not have exactly one clock"
                         )
                     else:
-                        clock_nets.add(clocks[0])
+                        clock_leaf_nets.add(clocks[0])
+                        clock_source_nets.add(
+                            self.transparent_source_net(clocks[0])
+                        )
                     if len(resets) > 1:
                         reasons.append(
                             f"{stage.flip_flop} has multiple reset controls"
@@ -1024,8 +1195,8 @@ class Design:
 
                 if len(enable_nets) != 1:
                     reasons.append("stages do not share one enable net")
-                if len(clock_nets) != 1:
-                    reasons.append("stages do not share one clock net")
+                if len(clock_source_nets) != 1:
+                    reasons.append("stages do not share one buffered clock source")
                 if len(reset_nets) != 1:
                     reasons.append("stages do not share one reset net")
                 if len(hold_pins) != 1 or len(data_pins) != 1:
@@ -1106,14 +1277,8 @@ class Design:
                     stages=tuple(ordered_stages),
                     serial_input_net=first.data_net,
                     enable_net=first.select_net,
-                    clock_net=next(
-                        iter(
-                            self.instances[first.flip_flop].pins[pin].net
-                            for pin in self.instances[
-                                first.flip_flop
-                            ].model.clock_pins
-                        )
-                    ),
+                    clock_net=next(iter(clock_source_nets)),
+                    clock_leaf_nets=tuple(sorted(clock_leaf_nets)),
                     reset_net=next(iter(reset_nets)),
                     parallel_output_nets=tuple(
                         stage.q_net for stage in ordered_stages
@@ -1123,7 +1288,7 @@ class Design:
                         "exclusive point-to-point mux.X -> D wiring",
                         "exactly one self-feedback mux input per stage",
                         "single unbranched acyclic serial chain",
-                        "uniform clock, reset, enable, and mux orientation",
+                        "uniform buffered clock source, reset, enable, and mux orientation",
                         "internal mux loads exactly match hold/shift wiring",
                     ),
                 )
@@ -1180,6 +1345,7 @@ class Design:
                         "serial_input_net": shift_register.serial_input_net,
                         "enable_net": shift_register.enable_net,
                         "clock_net": shift_register.clock_net,
+                        "clock_leaf_nets": list(shift_register.clock_leaf_nets),
                         "reset_net": shift_register.reset_net,
                         "parallel_output_nets": list(
                             shift_register.parallel_output_nets

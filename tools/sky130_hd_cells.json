@@ -1,0 +1,1253 @@
+{
+  "cells": {
+    "a2111oi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first input of 4-input NOR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "C1",
+        "D1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!B1&!C1&!D1) | (!A2&!B1&!C1&!D1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a211o": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first input of 3-input OR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&A2) | (B1) | (C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a211oi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first input of 3-input NOR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!B1&!C1) | (!A2&!B1&!C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a21bo": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first input of 2-input OR, 2nd input inverted.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&A2) | (!B1_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a21boi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first input of 2-input NOR, 2nd input inverted.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&B1_N) | (!A2&B1_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a21o": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first input of 2-input OR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&A2) | (B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a21oi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first input of 2-input NOR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!B1) | (!A2&!B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a221o": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first two inputs of 3-input OR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(B1&B2) | (A1&A2) | (C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a221oi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into first two inputs of 3-input NOR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!B1&!C1) | (!A1&!B2&!C1) | (!A2&!B1&!C1) | (!A2&!B2&!C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a22o": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into both inputs of 2-input OR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(B1&B2) | (A1&A2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a22oi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND into both inputs of 2-input NOR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!B1) | (!A1&!B2) | (!A2&!B1) | (!A2&!B2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a311o": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input AND into first input of 3-input OR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&A2&A3) | (B1) | (C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a31o": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input AND into first input of 2-input OR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&A2&A3) | (B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a31oi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input AND into first input of 2-input NOR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!B1) | (!A2&!B1) | (!A3&!B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a32o": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input AND into first input, and 2-input AND into 2nd input of 2-input OR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&A2&A3) | (B1&B2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "a41oi": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input AND into first input of 2-input NOR.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!B1) | (!A2&!B1) | (!A3&!B1) | (!A4&!B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "and2": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND.",
+      "inputs": [
+        "A",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A&B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "and2b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input AND, first input inverted.",
+      "inputs": [
+        "A_N",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(!A_N&B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "and3": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input AND.",
+      "inputs": [
+        "A",
+        "B",
+        "C"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A&B&C)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "and3b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input AND, first input inverted.",
+      "inputs": [
+        "A_N",
+        "B",
+        "C"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(!A_N&B&C)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "and4": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input AND.",
+      "inputs": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A&B&C&D)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "and4b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input AND, first input inverted.",
+      "inputs": [
+        "A_N",
+        "B",
+        "C",
+        "D"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(!A_N&B&C&D)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "and4bb": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input AND, first two inputs inverted.",
+      "inputs": [
+        "A_N",
+        "B_N",
+        "C",
+        "D"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(!A_N&!B_N&C&D)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "buf": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "Buffer.",
+      "inputs": [
+        "A"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "clkbuf": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "Clock tree buffer.",
+      "inputs": [
+        "A"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "conb": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "Constant value, low, high outputs.",
+      "inputs": [],
+      "next_state": null,
+      "outputs": {
+        "HI": "1",
+        "LO": "0"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "dfrtp": {
+      "clear": "!RESET_B",
+      "clock_pins": [
+        "CLK"
+      ],
+      "clocked_on": "CLK",
+      "description": "Delay flop, inverted reset, single output.",
+      "inputs": [
+        "D"
+      ],
+      "next_state": "D",
+      "outputs": {
+        "Q": "IQ"
+      },
+      "preset": null,
+      "reset_pins": [
+        "RESET_B"
+      ],
+      "sequential": true,
+      "set_pins": []
+    },
+    "dfstp": {
+      "clear": null,
+      "clock_pins": [
+        "CLK"
+      ],
+      "clocked_on": "CLK",
+      "description": "Delay flop, inverted set, single output.",
+      "inputs": [
+        "D"
+      ],
+      "next_state": "D",
+      "outputs": {
+        "Q": "IQ"
+      },
+      "preset": "!SET_B",
+      "reset_pins": [],
+      "sequential": true,
+      "set_pins": [
+        "SET_B"
+      ]
+    },
+    "dfxtp": {
+      "clear": null,
+      "clock_pins": [
+        "CLK"
+      ],
+      "clocked_on": "CLK",
+      "description": "Delay flop, single output.",
+      "inputs": [
+        "D"
+      ],
+      "next_state": "D",
+      "outputs": {
+        "Q": "IQ"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": true,
+      "set_pins": []
+    },
+    "inv": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "Inverter.",
+      "inputs": [
+        "A"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "mux2": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input multiplexer.",
+      "inputs": [
+        "A0",
+        "A1",
+        "S"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A0&!S) | (A1&S)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nand2": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input NAND.",
+      "inputs": [
+        "A",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A) | (!B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nand2b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input NAND, first input inverted.",
+      "inputs": [
+        "A_N",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(A_N) | (!B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nand3": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input NAND.",
+      "inputs": [
+        "A",
+        "B",
+        "C"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A) | (!B) | (!C)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nand3b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input NAND, first input inverted.",
+      "inputs": [
+        "A_N",
+        "B",
+        "C"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(A_N) | (!B) | (!C)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nand4": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input NAND.",
+      "inputs": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A) | (!B) | (!C) | (!D)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nor2": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input NOR.",
+      "inputs": [
+        "A",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A&!B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nor3": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input NOR.",
+      "inputs": [
+        "A",
+        "B",
+        "C"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A&!B&!C)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nor3b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input NOR, first input inverted.",
+      "inputs": [
+        "A",
+        "B",
+        "C_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A&!B&C_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nor4": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input NOR.",
+      "inputs": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A&!B&!C&!D)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "nor4b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input NOR, first input inverted.",
+      "inputs": [
+        "A",
+        "B",
+        "C",
+        "D_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A&!B&!C&D_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o211a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into first input of 3-input AND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&B1&C1) | (A2&B1&C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o211ai": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into first input of 3-input NAND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!A2) | (!B1) | (!C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o21a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into first input of 2-input AND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&B1) | (A2&B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o21ai": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into first input of 2-input NAND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!A2) | (!B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o21ba": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into first input of 2-input AND, 2nd input inverted.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&!B1_N) | (A2&!B1_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o21bai": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into first input of 2-input NAND, 2nd iput inverted.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!A2) | (B1_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o221a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into first two inputs of 3-input AND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&B1&C1) | (A2&B1&C1) | (A1&B2&C1) | (A2&B2&C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o22a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into both inputs of 2-input AND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&B1) | (A2&B1) | (A1&B2) | (A2&B2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o22ai": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR into both inputs of 2-input NAND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!B1&!B2) | (!A1&!A2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o2bb2a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input NAND and 2-input OR into 2-input AND.",
+      "inputs": [
+        "A1_N",
+        "A2_N",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(!A1_N&B1) | (!A2_N&B1) | (!A1_N&B2) | (!A2_N&B2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o311a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input OR into 3-input AND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "C1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&B1&C1) | (A2&B1&C1) | (A3&B1&C1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o31a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input OR into 2-input AND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&B1) | (A2&B1) | (A3&B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o31ai": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input OR into 2-input NAND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!A2&!A3) | (!B1)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o32a": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input OR and 2-input OR into 2-input AND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A1&B1) | (A1&B2) | (A2&B1) | (A3&B1) | (A2&B2) | (A3&B2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "o32ai": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input OR and 2-input OR into 2-input NAND.",
+      "inputs": [
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A1&!A2&!A3) | (!B1&!B2)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "or2": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input OR.",
+      "inputs": [
+        "A",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A) | (B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "or3": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input OR.",
+      "inputs": [
+        "A",
+        "B",
+        "C"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A) | (B) | (C)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "or3b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "3-input OR, first input inverted.",
+      "inputs": [
+        "A",
+        "B",
+        "C_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A) | (B) | (!C_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "or4": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input OR.",
+      "inputs": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A) | (B) | (C) | (D)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "or4b": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input OR, first input inverted.",
+      "inputs": [
+        "A",
+        "B",
+        "C",
+        "D_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A) | (B) | (C) | (!D_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "or4bb": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "4-input OR, first two inputs inverted.",
+      "inputs": [
+        "A",
+        "B",
+        "C_N",
+        "D_N"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A) | (B) | (!C_N) | (!D_N)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "xnor2": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input exclusive NOR.",
+      "inputs": [
+        "A",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "Y": "(!A&!B) | (A&B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    },
+    "xor2": {
+      "clear": null,
+      "clock_pins": [],
+      "clocked_on": null,
+      "description": "2-input exclusive OR.",
+      "inputs": [
+        "A",
+        "B"
+      ],
+      "next_state": null,
+      "outputs": {
+        "X": "(A&!B) | (!A&B)"
+      },
+      "preset": null,
+      "reset_pins": [],
+      "sequential": false,
+      "set_pins": []
+    }
+  },
+  "liberty_corner": "tt_025C_1v80",
+  "schema_version": 1,
+  "source": "https://github.com/google/skywater-pdk-libs-sky130_fd_sc_hd",
+  "source_revision": "ac7fb61f06e6470b94e8afdf7c25268f62fbd7b1"
+}

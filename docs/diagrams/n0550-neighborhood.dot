@@ -1,0 +1,27 @@
+digraph netlist {
+  rankdir=LR;
+  graph [fontname="Helvetica", labelloc=t];
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica", fontsize=9];
+  label="n0550: radius 1";
+  "cell:U516_a31oi_2" [shape=box, label="U516_a31oi_2\\na31oi"];
+  "cell:U521_a311o_2" [shape=box, label="U521_a311o_2\\na311o"];
+  "net:n0523" [shape=ellipse, label="n0523"];
+  "net:n0525" [shape=ellipse, label="n0525"];
+  "net:n0550" [shape=ellipse, label="n0550"];
+  "net:n0551" [shape=ellipse, label="n0551"];
+  "net:n0552" [shape=ellipse, label="n0552"];
+  "net:n0553" [shape=ellipse, label="n0553"];
+  "net:n0557" [shape=ellipse, label="n0557"];
+  "cell:U516_a31oi_2" -> "net:n0523" [label="Y"];
+  "cell:U521_a311o_2" -> "net:n0525" [label="X"];
+  "net:n0550" -> "cell:U516_a31oi_2" [label="A1"];
+  "net:n0550" -> "cell:U521_a311o_2" [label="A1"];
+  "net:n0551" -> "cell:U516_a31oi_2" [label="A2"];
+  "net:n0551" -> "cell:U521_a311o_2" [label="A2"];
+  "net:n0552" -> "cell:U516_a31oi_2" [label="A3"];
+  "net:n0552" -> "cell:U521_a311o_2" [label="A3"];
+  "net:n0553" -> "cell:U516_a31oi_2" [label="B1"];
+  "net:n0553" -> "cell:U521_a311o_2" [label="C1"];
+  "net:n0557" -> "cell:U521_a311o_2" [label="B1"];
+}

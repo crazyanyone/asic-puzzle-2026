@@ -5,15 +5,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from netlist_ir import Design
+from tools.netlist_ir import Design
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures"
 
 
 class StrictShiftRegisterTests(unittest.TestCase):
     def test_toy_is_one_strict_two_stage_shift_register(self) -> None:
-        design = Design.load(ROOT / "toynets.json")
+        design = Design.load(FIXTURES / "toy_nets.json")
 
         analysis = design.strict_shift_registers()
 
@@ -34,8 +35,23 @@ class StrictShiftRegisterTests(unittest.TestCase):
             frozenset({"FF0_dfrtp", "M0_mux2", "FF1_dfrtp", "M1_mux2"}),
         )
 
+    def test_puzzle_has_one_twelve_stage_register_behind_clock_buffers(self) -> None:
+        design = Design.load(ROOT / "artifacts" / "netlists" / "puzzle.json")
+
+        analysis = design.strict_shift_registers()
+
+        self.assertEqual(len(analysis.shift_registers), 1)
+        shift_register = analysis.shift_registers[0]
+        self.assertEqual(shift_register.name, "shift_I")
+        self.assertEqual(shift_register.width, 12)
+        self.assertEqual(shift_register.clock_net, "clk")
+        self.assertEqual(
+            set(shift_register.clock_leaf_nets),
+            {"n0121", "n0177", "n0327", "n0338"},
+        )
+
     def test_stray_pin_on_member_mux_rejects_whole_chain(self) -> None:
-        raw = json.loads((ROOT / "toynets.json").read_text())
+        raw = json.loads((FIXTURES / "toy_nets.json").read_text())
         raw["('toy', 1)"].append("M0_mux2.EXTRA")
 
         with tempfile.TemporaryDirectory() as directory:
@@ -57,7 +73,7 @@ class StrictShiftRegisterTests(unittest.TestCase):
         )
 
     def test_downstream_mux_consumer_is_exposed_as_boundary_load(self) -> None:
-        raw = json.loads((ROOT / "toynets.json").read_text())
+        raw = json.loads((FIXTURES / "toy_nets.json").read_text())
         raw["('toy', 1)"].append("DOWNSTREAM_mux2.A0")
 
         with tempfile.TemporaryDirectory() as directory:
@@ -75,7 +91,7 @@ class StrictShiftRegisterTests(unittest.TestCase):
         )
 
     def test_nonexclusive_d_net_rejects_whole_chain(self) -> None:
-        raw = json.loads((ROOT / "toynets.json").read_text())
+        raw = json.loads((FIXTURES / "toy_nets.json").read_text())
         raw["('toy', 0)"].append("TAP_and2.A")
 
         with tempfile.TemporaryDirectory() as directory:
@@ -97,7 +113,7 @@ class StrictShiftRegisterTests(unittest.TestCase):
         )
 
     def test_mixed_enable_controls_reject_whole_chain(self) -> None:
-        raw = json.loads((ROOT / "toynets.json").read_text())
+        raw = json.loads((FIXTURES / "toy_nets.json").read_text())
         raw["en"].remove("M1_mux2.S")
         raw["en2"] = ["M1_mux2.S"]
 
@@ -117,7 +133,7 @@ class StrictShiftRegisterTests(unittest.TestCase):
         self.assertIn("stages do not share one enable net", reasons)
 
     def test_branched_shift_path_rejects_whole_group(self) -> None:
-        raw = json.loads((ROOT / "toynets.json").read_text())
+        raw = json.loads((FIXTURES / "toy_nets.json").read_text())
         raw["en"].append("M2_mux2.S")
         raw["clk"].append("FF2_dfrtp.CLK")
         raw["rst_n"].append("FF2_dfrtp.RESET_B")

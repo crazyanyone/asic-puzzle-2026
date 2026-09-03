@@ -1,0 +1,2 @@
+# Geometry engine used to read and boolean-merge GDSII polygons.
+gdstk>=0.9.61,<2

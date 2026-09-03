@@ -1,28 +1,92 @@
-# ASIC Reverse-Engineering Puzzle
+# ASIC reverse-engineering puzzle
 
-This repository provides the files for the Jane Street ASIC reverse-engineering puzzle! See the [blog post](https://blog.janestreet.com/can-you-reverse-engineer-an-asic/) for more details.
+This repository works from the physical layout upward:
 
-### Puzzle GDS
+```text
+GDS polygons -> connected conductor regions -> nets and terminals
+             -> typed gate graph -> conservative circuit abstractions
+```
 
-The puzzle GDS is in this repository, in the file named `puzzle.gds`. You can preview it using [KLayout](https://www.klayout.de/) or the [TinyTapeout Online GDS Viewer](https://gds-viewer.tinytapeout.com/).
+The objective is not merely to guess the circuit. Every abstraction should be
+traceable back to geometry and carry enough checks to make false recognition
+unlikely. See [docs/workflow.md](docs/workflow.md) for the reasoning behind each
+stage.
 
-See `example_inputs.vcd` which shows some inputs being fed to the design (unfortunately, not the correct inputs to make `success` go high!). You can view it using [Surfer](https://surfer-project.org/) or a similar tool.
+## Ground-truth discipline
 
-To help you get started, below is an image with some hints. The region labelled as "output generator" is safe to ignore during your initial reverse-engineering steps, but you'll need to simulate it to get your final answer!
+For the warm-up, use only `warmup/04_final.gds` as input. The other files in
+`warmup/` are provided ground truth and should stay unopened until an
+independent behavioral result is ready for a final cross-check. The analysis
+commands below do not read them.
 
-![](layout.png)
+## Setup
 
-### Warm-up Puzzle
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
 
-To familiarize yourself with the flow and help develop your tools, we've put together a small example design and run it through a very similar flow to the one used for the real thing! The example design consists of two shift registers, an adder, and a comparator, outputting success if `A + B == 496`.
+`gdstk` is the only third-party dependency. Graphviz is optional and is used
+only to render `.dot` files.
 
-You'll find the following files related to the warm-up puzzle:
+## Reproduce the warm-up pipeline
 
-- `warmup/00_source.v`: The original Verilog source code of the example design
-- `warmup/01_netlist.v`: Synthesized netlist comprising of a list of standard cells
-  and connections
-- `warmup/02_netlist_with_power_rails.v`: Netlist with VDD and GND rails added
-- `warmup/03_post_place_and_route.def`: Physical layout of cells and routing
-  connections, corresponding to cell and net names.
-- `warmup/04_final.gds`: The final manufacturable layout file, with many internal names
-  removed
+```bash
+# 1. Inventory cells and labels without extracting connectivity.
+.venv/bin/python -m tools.inspect_gds warmup/04_final.gds
+
+# 2. Reconstruct nets from conductor and via geometry.
+.venv/bin/python -m tools.extract_netlist \
+  warmup/04_final.gds --json artifacts/netlists/warmup.json
+
+# 3. Validate and query the typed graph.
+.venv/bin/python -m tools.analyze_netlist \
+  artifacts/netlists/warmup.json summary
+.venv/bin/python -m tools.analyze_netlist \
+  artifacts/netlists/warmup.json shift-registers --show-rejected
+.venv/bin/python -m tools.analyze_netlist \
+  artifacts/netlists/warmup.json cone S --dot generated/warmup-success.dot
+
+# 4. Run unit and end-to-end extraction regression tests.
+.venv/bin/python -m unittest discover -v
+```
+
+To render a graph:
+
+```bash
+dot -Tsvg generated/warmup-success.dot -o generated/warmup-success.svg
+```
+
+`generated/` is intentionally ignored. Checked-in extracted netlists are
+reproducible snapshots, not additional sources of truth.
+
+## Repository map
+
+- `tools/extract_netlist.py`: GDS geometry and union-find connectivity.
+- `tools/netlist_ir.py`: cell models and the queryable graph representation.
+- `tools/logic.py`: safe parser/evaluator for the Liberty Boolean subset.
+- `tools/import_sky130_models.py`: refresh/check the official cell snapshot.
+- `tools/circuit_eval.py`: concrete Boolean evaluation and one-edge transitions.
+- `tools/simulate_netlist.py`: play input sequences through extracted state.
+- `tools/check_influence.py`: exhaustive small-cone influence checks.
+- `tools/analyze_netlist.py`: inspection, cones, register motifs, and DOT output.
+- `tools/inspect_gds.py`: quick GDS hierarchy/cell inventory.
+- `tests/fixtures/toy_nets.json`: a graph small enough to follow by hand.
+- `tests/`: focused motif tests plus a real warm-up re-extraction test.
+- `artifacts/netlists/`: reproducible extracted connectivity snapshots.
+- `examples/warmup_exhaustive.py`: the complete 65,536-state warm-up search.
+- `docs/`: first-principles explanation and current limitations.
+- `warmup/`: competition-provided warm-up files; only `04_final.gds` is an input.
+
+Detailed worked examples and investigations:
+
+- [Toy glass-box walkthrough](docs/toy-walkthrough.md)
+- [12-bit register and `n0550`](docs/puzzle-investigations.md)
+
+The 64 cell types used by the extracted designs are loaded from the checked-in
+official Liberty snapshot `tools/sky130_hd_cells.json`. To refresh or validate
+it against a Sky130-HD checkout:
+
+```bash
+.venv/bin/python -m tools.import_sky130_models /path/to/sky130_fd_sc_hd --check
+```

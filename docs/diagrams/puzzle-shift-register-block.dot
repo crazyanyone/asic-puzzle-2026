@@ -1,0 +1,18 @@
+digraph shift_registers {
+  rankdir=LR;
+  graph [fontname="Helvetica", labelloc=t];
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica", fontsize=9];
+  label="Strict shift-register abstractions";
+  "block:shift_I" [shape=box3d, label="shift_I\\nShiftRegister[12]"];
+  "net:I" [shape=diamond, label="I"];
+  "net:I" -> "block:shift_I" [label="serial"];
+  "net:n0005" [shape=diamond, label="U351_and2b_2.X"];
+  "net:n0005" -> "block:shift_I" [label="enable"];
+  "net:clk" [shape=diamond, label="clk"];
+  "net:clk" -> "block:shift_I" [label="clock"];
+  "net:rst_n" [shape=diamond, label="rst_n"];
+  "net:rst_n" -> "block:shift_I" [label="reset"];
+  "outputs:shift_I" [shape=ellipse, label="shift_I.Q[11:0]\\n4 externally used taps"];
+  "block:shift_I" -> "outputs:shift_I" [label="parallel Q"];
+}

@@ -6,17 +6,17 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from analyze import write_dot
-from netlist_ir import Design
+from tools.analyze_netlist import write_dot
+from tools.netlist_ir import Design
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class AbstractVisualizationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.design = Design.load(ROOT / "nets.json")
+        cls.design = Design.load(ROOT / "artifacts" / "netlists" / "warmup.json")
 
     def render_dot(
         self,

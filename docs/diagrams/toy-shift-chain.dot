@@ -1,0 +1,35 @@
+digraph netlist {
+  rankdir=LR;
+  graph [fontname="Helvetica", labelloc=t];
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica", fontsize=9];
+  label="Detected enabled shift chains";
+  "cell:FF0_dfrtp" [shape=doubleoctagon, label="FF0_dfrtp\\ndfrtp"];
+  "cell:FF1_dfrtp" [shape=doubleoctagon, label="FF1_dfrtp\\ndfrtp"];
+  "cell:M0_mux2" [shape=box, label="M0_mux2\\nmux2"];
+  "cell:M1_mux2" [shape=box, label="M1_mux2\\nmux2"];
+  "net:('toy', 0)" [shape=ellipse, label="('toy', 0)"];
+  "net:('toy', 1)" [shape=ellipse, label="('toy', 1)"];
+  "net:('toy', 2)" [shape=ellipse, label="('toy', 2)"];
+  "net:('toy', 3)" [shape=ellipse, label="('toy', 3)"];
+  "net:clk" [shape=diamond, label="clk"];
+  "net:din" [shape=diamond, label="din"];
+  "net:en" [shape=diamond, label="en"];
+  "net:rst_n" [shape=diamond, label="rst_n"];
+  "cell:M0_mux2" -> "net:('toy', 0)" [label="X"];
+  "net:('toy', 0)" -> "cell:FF0_dfrtp" [label="D"];
+  "cell:FF0_dfrtp" -> "net:('toy', 1)" [label="Q"];
+  "net:('toy', 1)" -> "cell:M0_mux2" [label="A0"];
+  "net:('toy', 1)" -> "cell:M1_mux2" [label="A1"];
+  "cell:M1_mux2" -> "net:('toy', 2)" [label="X"];
+  "net:('toy', 2)" -> "cell:FF1_dfrtp" [label="D"];
+  "cell:FF1_dfrtp" -> "net:('toy', 3)" [label="Q"];
+  "net:('toy', 3)" -> "cell:M1_mux2" [label="A0"];
+  "net:clk" -> "cell:FF0_dfrtp" [label="CLK"];
+  "net:clk" -> "cell:FF1_dfrtp" [label="CLK"];
+  "net:din" -> "cell:M0_mux2" [label="A1"];
+  "net:en" -> "cell:M0_mux2" [label="S"];
+  "net:en" -> "cell:M1_mux2" [label="S"];
+  "net:rst_n" -> "cell:FF0_dfrtp" [label="RESET_B"];
+  "net:rst_n" -> "cell:FF1_dfrtp" [label="RESET_B"];
+}

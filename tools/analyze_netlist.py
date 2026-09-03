@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
-"""Query and visualize netlists produced by extract_netlist.py.
+"""Query and visualize netlists produced by tools.extract_netlist.
 
 Examples:
-    python3 analyze.py toynets.json summary
-    python3 analyze.py nets.json net rst_n
-    python3 analyze.py nets.json instance U12 --depth 2
-    python3 analyze.py nets.json instance U12 --depth 2 --dot u12.dot
-    python3 analyze.py nets.json cone S --dot success-cone.dot
-    python3 analyze.py nets.json registers
-    python3 analyze.py nets.json shift-chains --dot shift-chains.dot
-    python3 analyze.py nets.json shift-registers --dot shift-registers.dot
-    python3 analyze.py nets.json export --out design.json
+    python3 -m tools.analyze_netlist tests/fixtures/toy_nets.json summary
+    python3 -m tools.analyze_netlist artifacts/netlists/warmup.json net rst_n
+    python3 -m tools.analyze_netlist artifacts/netlists/warmup.json instance U12 --depth 2
+    python3 -m tools.analyze_netlist artifacts/netlists/warmup.json cone S --dot generated/success-cone.dot
+    python3 -m tools.analyze_netlist artifacts/netlists/warmup.json registers
+    python3 -m tools.analyze_netlist artifacts/netlists/warmup.json shift-registers
+    python3 -m tools.analyze_netlist artifacts/netlists/warmup.json export --out generated/design.json
 
 Render a DOT file with Graphviz:
-    dot -Tsvg success-cone.dot -o success-cone.svg
+    dot -Tsvg generated/warmup-success.dot -o generated/warmup-success.svg
 """
 
 from __future__ import annotations
@@ -24,7 +22,7 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from netlist_ir import (
+from tools.netlist_ir import (
     Design,
     EnabledRegister,
     Instance,
@@ -65,14 +63,19 @@ def write_dot(
     net_names: set[str],
     output_path: str,
     title: str,
+    collapse_shift_registers: bool = True,
 ) -> None:
     """Write a focused graph with proven shift registers collapsed."""
     shift_analysis = design.strict_shift_registers()
-    collapsed_shift_registers = [
-        shift_register
-        for shift_register in shift_analysis.shift_registers
-        if shift_register.member_instances & cell_names
-    ]
+    collapsed_shift_registers = (
+        [
+            shift_register
+            for shift_register in shift_analysis.shift_registers
+            if shift_register.member_instances & cell_names
+        ]
+        if collapse_shift_registers
+        else []
+    )
     collapsed_members = {
         instance
         for shift_register in collapsed_shift_registers
@@ -198,8 +201,10 @@ def write_dot(
                 )
 
     lines.append("}")
-    Path(output_path).write_text("\n".join(lines) + "\n")
-    svg_path = Path(output_path).with_suffix(".svg")
+    dot_path = Path(output_path)
+    dot_path.parent.mkdir(parents=True, exist_ok=True)
+    dot_path.write_text("\n".join(lines) + "\n")
+    svg_path = dot_path.with_suffix(".svg")
     print(f"Wrote {output_path}")
     print(f"Render with: dot -Tsvg {output_path} -o {svg_path}")
 
@@ -272,8 +277,10 @@ def write_shift_register_dot(
         )
 
     lines.append("}")
-    Path(output_path).write_text("\n".join(lines) + "\n")
-    svg_path = Path(output_path).with_suffix(".svg")
+    dot_path = Path(output_path)
+    dot_path.parent.mkdir(parents=True, exist_ok=True)
+    dot_path.write_text("\n".join(lines) + "\n")
+    svg_path = dot_path.with_suffix(".svg")
     print(f"Wrote {output_path}")
     print(f"Render with: dot -Tsvg {output_path} -o {svg_path}")
 
@@ -313,7 +320,12 @@ def print_summary(design: Design) -> None:
         print(f"  ... {len(issues) - 25} more")
 
 
-def print_net(design: Design, requested_name: str) -> None:
+def print_net(
+    design: Design,
+    requested_name: str,
+    depth: int,
+    dot_path: str | None,
+) -> None:
     net = design.resolve_net(requested_name)
     print(f"Net:        {net.name}")
     print(f"Aliases:    {', '.join(net.aliases)}")
@@ -333,6 +345,17 @@ def print_net(design: Design, requested_name: str) -> None:
         print("Grouped loads:")
         for (cell_type, pin, role), names in sorted(grouped.items()):
             print(f"  {len(names):>4} × {cell_type}.{pin:<12} role={role}")
+
+    if dot_path:
+        cells, nets = design.net_neighborhood(net.name, depth)
+        write_dot(
+            design,
+            cells,
+            nets,
+            dot_path,
+            f"{net.name}: radius {depth}",
+            collapse_shift_registers=False,
+        )
 
 
 def pin_connection_description(
@@ -501,6 +524,20 @@ def print_shift_chains(design: Design, dot_path: str | None) -> None:
 
     cells: set[str] = set()
     nets: set[str] = set()
+
+    def include_buffer_source_path(net_name: str) -> None:
+        seen: set[str] = set()
+        while net_name not in seen:
+            seen.add(net_name)
+            nets.add(net_name)
+            driver = design.driver_of(net_name)
+            if driver is None:
+                return
+            instance = design.instances[driver.instance]
+            if instance.cell_type not in {"buf", "clkbuf"} or "A" not in instance.pins:
+                return
+            cells.add(instance.name)
+            net_name = instance.pins["A"].net
     for index, chain in enumerate(chains, start=1):
         if not chain:
             continue
@@ -519,10 +556,24 @@ def print_shift_chains(design: Design, dot_path: str | None) -> None:
             nets.update(
                 (register.q_net, register.d_net, register.data_net, register.select_net)
             )
+            flip_flop = design.instances[register.flip_flop]
+            for pin in flip_flop.model.clock_pins + flip_flop.model.reset_pins:
+                if pin in flip_flop.pins:
+                    nets.add(flip_flop.pins[pin].net)
+            for pin in flip_flop.model.clock_pins:
+                if pin in flip_flop.pins:
+                    include_buffer_source_path(flip_flop.pins[pin].net)
         print()
 
     if dot_path:
-        write_dot(design, cells, nets, dot_path, "Detected enabled shift chains")
+        write_dot(
+            design,
+            cells,
+            nets,
+            dot_path,
+            "Detected enabled shift chains",
+            collapse_shift_registers=False,
+        )
 
 
 def print_shift_registers(
@@ -543,6 +594,11 @@ def print_shift_registers(
         print(f"  serial input: {serial_source}")
         print(f"  enable:       {shift_register.enable_net}")
         print(f"  clock:        {shift_register.clock_net}")
+        if shift_register.clock_leaf_nets != (shift_register.clock_net,):
+            print(
+                "  clock leaves: "
+                + ", ".join(shift_register.clock_leaf_nets)
+            )
         print(f"  reset:        {shift_register.reset_net or '(none)'}")
         print(
             "  transition:   "
@@ -578,7 +634,9 @@ def print_shift_registers(
 
 
 def export_design(design: Design, output_path: str) -> None:
-    with Path(output_path).open("w") as fh:
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w") as fh:
         json.dump(design.to_dict(), fh, indent=2)
         fh.write("\n")
     print(f"Wrote {output_path}")
@@ -593,6 +651,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     net_parser = subparsers.add_parser("net", help="Describe one net or port")
     net_parser.add_argument("name", help="Net name, port alias, or instance.pin")
+    net_parser.add_argument(
+        "--depth", type=int, default=1, help="Neighborhood radius for DOT output"
+    )
+    net_parser.add_argument("--dot", help="Write neighborhood as Graphviz DOT")
 
     instance_parser = subparsers.add_parser(
         "instance", help="Describe one instance and optionally draw its neighborhood"
@@ -652,7 +714,7 @@ def main() -> int:
         if args.command == "summary":
             print_summary(design)
         elif args.command == "net":
-            print_net(design, args.name)
+            print_net(design, args.name, args.depth, args.dot)
         elif args.command == "instance":
             print_instance(design, args.name, args.depth, args.dot)
         elif args.command == "cone":

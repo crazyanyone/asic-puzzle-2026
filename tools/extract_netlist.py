@@ -7,13 +7,13 @@ The whole idea (pure geometric extraction, i.e. a mini "LVS extract"):
   2. Read every pin as a (name, chip-coordinate, layer) triple.
   3. Recover NETS from geometry:
        - merge touching shapes WITHIN each conductor layer   -> boolean "or"
-       - stitch conductors ACROSS layers where a via overlaps -> overlap + union-find
+       - stitch conductors ACROSS layers at each via cut       -> union-find
        - a pin belongs to whichever merged conductor contains its point
      Two pins on the same net = electrically connected.
 
-Usage:
-    python3 extract_netlist.py warmup/04_final.gds
-    python3 extract_netlist.py warmup/04_final.gds --json nets.json
+Usage (from the repository root):
+    python3 -m tools.extract_netlist warmup/04_final.gds
+    python3 -m tools.extract_netlist warmup/04_final.gds --json artifacts/netlists/warmup.json
 """
 
 from __future__ import annotations
@@ -22,6 +22,8 @@ import argparse
 import json
 import sys
 from collections import defaultdict
+from dataclasses import dataclass
+from pathlib import Path
 
 import gdstk
 
@@ -63,7 +65,7 @@ FILLER_PREFIXES = (
 )
 
 # Pins we treat as power/ground rather than signal nets.
-POWER_NAMES = {"VPWR", "VGND", "VPB", "VNB"}
+POWER_NAMES = {"VPWR", "VGND", "VPB", "VNB", "VDD", "VSS"}
 
 
 def is_logic(name: str) -> bool:
@@ -126,9 +128,86 @@ def region_index_containing(regions: list[gdstk.Polygon],
     return None
 
 
-def extract(gds_path: str):
+@dataclass
+class ExtractionResult:
+    """Connectivity plus the evidence needed to audit the extraction."""
+
+    source_gds: str
+    top_cell: str
+    net_members: dict[object, set[str]]
+    net_aliases: dict[object, set[str]]
+    via_stats: dict[str, tuple[int, int]]
+    unresolved_pins: list[str]
+    unresolved_ports: list[str]
+
+    def rows(self) -> list[tuple[str, tuple[str, ...], list[str]]]:
+        """Return deterministic (id, aliases, terminals) records.
+
+        Internal ids are deliberately semantic-free. Unlike the old tuple
+        repr names, they do not expose polygon ordering as circuit meaning.
+        """
+        roots = set(self.net_members) | set(self.net_aliases)
+        named: list[tuple[tuple[str, ...], list[str]]] = []
+        internal: list[list[str]] = []
+        for root in roots:
+            aliases = tuple(sorted(self.net_aliases.get(root, ())))
+            members = sorted(self.net_members.get(root, ()))
+            if aliases:
+                named.append((aliases, members))
+            elif members:
+                internal.append(members)
+
+        rows: list[tuple[str, tuple[str, ...], list[str]]] = []
+        for aliases, members in sorted(named):
+            rows.append(("|".join(aliases), aliases, members))
+        for index, members in enumerate(sorted(internal)):
+            rows.append((f"n{index:04d}", (), members))
+        for index, terminal in enumerate(sorted(self.unresolved_pins)):
+            rows.append((f"unresolved_{index:04d}", (), [terminal]))
+        return rows
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "schema_version": 1,
+            "source_gds": self.source_gds,
+            "top_cell": self.top_cell,
+            "nets": {
+                net_id: {
+                    "aliases": list(aliases),
+                    "terminals": terminals,
+                }
+                for net_id, aliases, terminals in self.rows()
+            },
+            "diagnostics": {
+                "unresolved_pins": sorted(self.unresolved_pins),
+                "unresolved_ports": sorted(self.unresolved_ports),
+                "via_cuts": {
+                    stack: {"total": total, "stitched": stitched}
+                    for stack, (total, stitched) in self.via_stats.items()
+                },
+            },
+        }
+
+
+def extract(gds_path: str, top_name: str | None = None) -> ExtractionResult:
     lib = gdstk.read_gds(gds_path)
-    top = lib.top_level()[0]
+    tops = lib.top_level()
+    if top_name is not None:
+        matches = [cell for cell in tops if cell.name == top_name]
+        if len(matches) != 1:
+            available = ", ".join(cell.name for cell in tops) or "(none)"
+            raise ValueError(
+                f"top cell {top_name!r} not found; available top cells: {available}"
+            )
+        top = matches[0]
+    elif len(tops) == 1:
+        top = tops[0]
+    else:
+        available = ", ".join(cell.name for cell in tops) or "(none)"
+        raise ValueError(
+            "GDS must contain exactly one top-level cell unless --top is used; "
+            f"found: {available}"
+        )
 
     print(f"top cell: {top.name}", file=sys.stderr)
     print("merging conductor layers...", file=sys.stderr)
@@ -143,6 +222,7 @@ def extract(gds_path: str):
     # Stitch layers through vias: a via cut whose center lands inside a region
     # on both adjacent layers joins those two regions into one net.
     print("stitching layers through vias...", file=sys.stderr)
+    via_stats: dict[str, tuple[int, int]] = {}
     for low, high, (vl, vdt) in VIA_STACK:
         cuts = top.get_polygons(depth=None, layer=vl, datatype=vdt)
         joined = 0
@@ -155,11 +235,12 @@ def extract(gds_path: str):
                 joined += 1
         print(f"  {low}->{high}: {len(cuts)} cuts, {joined} stitched",
               file=sys.stderr)
+        via_stats[f"{low}->{high}"] = (len(cuts), joined)
 
     # Assign pins (from logic instances) to whichever region contains them.
     print("assigning pins to nets...", file=sys.stderr)
-    net_members: dict[object, list[str]] = defaultdict(list)
-    unresolved = 0
+    terminal_roots: dict[str, set[object]] = defaultdict(set)
+    unresolved_pins: set[str] = set()
     inst_id = 0
     for ref in top.references:
         if not is_logic(ref.cell.name):
@@ -174,65 +255,90 @@ def extract(gds_path: str):
             idx = region_index_containing(regions[layer_name], point)
             terminal = f"{gate}.{lab.text}"
             if idx is None:
-                unresolved += 1
-                net_members[("UNRESOLVED", terminal)].append(terminal)
+                unresolved_pins.add(terminal)
                 continue
-            net_members[dsu.find((layer_name, idx))].append(terminal)
+            terminal_roots[terminal].add(dsu.find((layer_name, idx)))
+
+    multiply_connected = {
+        terminal: roots
+        for terminal, roots in terminal_roots.items()
+        if len(roots) != 1
+    }
+    if multiply_connected:
+        terminals = ", ".join(sorted(multiply_connected))
+        raise ValueError(f"pin labels touch multiple disconnected nets: {terminals}")
+    net_members: dict[object, set[str]] = defaultdict(set)
+    for terminal, roots in terminal_roots.items():
+        net_members[next(iter(roots))].add(terminal)
 
     # Name nets using top-level port labels where possible.
     print("naming nets from top-level ports...", file=sys.stderr)
     net_names: dict[object, set[str]] = defaultdict(set)
+    alias_roots: dict[str, set[object]] = defaultdict(set)
+    unresolved_ports: set[str] = set()
     for lab in top.labels:
         layer_name = PORT_LABELS.get((lab.layer, lab.texttype))
         if layer_name is None:
             continue
         point = (float(lab.origin[0]), float(lab.origin[1]))
         idx = region_index_containing(regions[layer_name], point)
-        if idx is not None:
-            net_names[dsu.find((layer_name, idx))].add(lab.text)
+        if idx is None:
+            unresolved_ports.add(lab.text)
+            continue
+        root = dsu.find((layer_name, idx))
+        net_names[root].add(lab.text)
+        alias_roots[lab.text].add(root)
 
-    print(f"  unresolved pins: {unresolved}", file=sys.stderr)
-    return net_members, net_names
+    duplicate_aliases = {
+        alias: roots for alias, roots in alias_roots.items() if len(roots) != 1
+    }
+    if duplicate_aliases:
+        aliases = ", ".join(sorted(duplicate_aliases))
+        raise ValueError(f"top-level labels occur on multiple nets: {aliases}")
+
+    print(f"  unresolved pins: {len(unresolved_pins)}", file=sys.stderr)
+    print(f"  unresolved ports: {len(unresolved_ports)}", file=sys.stderr)
+    return ExtractionResult(
+        source_gds=str(gds_path),
+        top_cell=top.name,
+        net_members=dict(net_members),
+        net_aliases=dict(net_names),
+        via_stats=via_stats,
+        unresolved_pins=sorted(unresolved_pins),
+        unresolved_ports=sorted(unresolved_ports),
+    )
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("gds", help="Path to a .gds file")
+    ap.add_argument("--top", help="Top-level cell name (required only if ambiguous)")
     ap.add_argument("--json", metavar="OUT", help="Write nets to a JSON file")
     args = ap.parse_args()
 
-    net_members, net_names = extract(args.gds)
+    try:
+        result = extract(args.gds, args.top)
+    except (OSError, ValueError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
 
-    # Order: power nets last, biggest signal nets first.
-    def net_label(root) -> str:
-        names = net_names.get(root)
-        if names:
-            return "|".join(sorted(names))
-        return str(root)
-
-    rows = []
-    for root, members in net_members.items():
-        label = net_label(root)
-        is_power = any(n in POWER_NAMES for n in net_names.get(root, ()))
-        rows.append((is_power, -len(members), label, sorted(set(members))))
-    rows.sort()
-
+    rows = result.rows()
     print(f"\n=== {len(rows)} nets extracted ===\n")
-    for is_power, _, label, members in rows:
+    for net_id, aliases, members in rows:
+        is_power = bool(POWER_NAMES & set(aliases))
         tag = " [power]" if is_power else ""
-        print(f"net {label}{tag}  ({len(members)} terminals)")
+        print(f"net {net_id}{tag}  ({len(members)} terminals)")
         for m in members:
             print(f"    {m}")
         print()
 
     if args.json:
-        out = {
-            net_label(root): sorted(set(members))
-            for root, members in net_members.items()
-        }
-        with open(args.json, "w") as fh:
-            json.dump(out, fh, indent=2)
+        output_path = Path(args.json)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with output_path.open("w") as fh:
+            json.dump(result.to_dict(), fh, indent=2)
+            fh.write("\n")
         print(f"wrote {args.json}", file=sys.stderr)
 
     return 0

@@ -1,0 +1,4413 @@
+{
+  "source": "artifacts/netlists/warmup.json",
+  "ports": {
+    "A": {
+      "net": "A",
+      "direction": "input"
+    },
+    "B": {
+      "net": "B",
+      "direction": "input"
+    },
+    "S": {
+      "net": "S",
+      "direction": "output"
+    },
+    "VGND": {
+      "net": "VGND",
+      "direction": "power"
+    },
+    "VPWR": {
+      "net": "VPWR",
+      "direction": "power"
+    },
+    "clk": {
+      "net": "clk",
+      "direction": "input"
+    },
+    "en": {
+      "net": "en",
+      "direction": "input"
+    },
+    "rst_n": {
+      "net": "rst_n",
+      "direction": "input"
+    }
+  },
+  "instances": {
+    "U0_clkbuf_16": {
+      "cell_type": "clkbuf",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A",
+      "pins": {
+        "A": {
+          "net": "clk",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0000",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U10_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0002",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0003",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U11_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0004",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0005",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U12_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0006",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0007",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U13_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0008",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0009",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U14_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0010",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0011",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0012",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U15_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0005",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0013",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0004",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U16_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0014",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0009",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0015",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U17_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0013",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0007",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0016",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U18_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0015",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0014",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U19_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0016",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0013",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U1_and4bb_2": {
+      "cell_type": "and4bb",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = !A_N & !B_N & C & D",
+      "pins": {
+        "A_N": {
+          "net": "n0017",
+          "direction": "input",
+          "role": "data"
+        },
+        "B_N": {
+          "net": "n0018",
+          "direction": "input",
+          "role": "data"
+        },
+        "C": {
+          "net": "n0019",
+          "direction": "input",
+          "role": "data"
+        },
+        "D": {
+          "net": "n0020",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0021",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U20_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0022",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0023",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0024",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U21_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0023",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0025",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0026",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U22_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0025",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "B",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0027",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U23_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0029",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0030",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U24_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0031",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0032",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U25_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0033",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0034",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U26_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0024",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0022",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U27_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0034",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0030",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0033",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U28_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0035",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0032",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0036",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U29_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0030",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0037",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0029",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U2_and3_2": {
+      "cell_type": "and3",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B & C",
+      "pins": {
+        "A": {
+          "net": "n0038",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0039",
+          "direction": "input",
+          "role": "data"
+        },
+        "C": {
+          "net": "n0040",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0041",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U30_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0026",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0023",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U31_clkbuf_16": {
+      "cell_type": "clkbuf",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A",
+      "pins": {
+        "A": {
+          "net": "n0000",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0028",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U32_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0042",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0037",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U33_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0027",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0025",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U34_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0028",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0036",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0035",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U35_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0037",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0035",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0042",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U36_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0032",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0022",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0031",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U37_a31o_2": {
+      "cell_type": "a31o",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = (A1 & A2 & A3) | B1",
+      "pins": {
+        "A1": {
+          "net": "n0022",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0005",
+          "direction": "input",
+          "role": "data"
+        },
+        "A3": {
+          "net": "n0043",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1": {
+          "net": "n0044",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0045",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U38_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0034",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0014",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0046",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U39_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0032",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0003",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0047",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U3_clkbuf_16": {
+      "cell_type": "clkbuf",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A",
+      "pins": {
+        "A": {
+          "net": "n0000",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0001",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U40_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0037",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0010",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0048",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U41_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0049",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0050",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0051",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U42_a21boi_2": {
+      "cell_type": "a21boi",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !((A1 & A2) | !B1_N)",
+      "pins": {
+        "A1": {
+          "net": "n0052",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0053",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1_N": {
+          "net": "n0054",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0055",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U43_o21bai_2": {
+      "cell_type": "o21bai",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !((A1 | A2) & !B1_N)",
+      "pins": {
+        "A1": {
+          "net": "n0046",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0055",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1_N": {
+          "net": "n0056",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0040",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U44_and2_2": {
+      "cell_type": "and2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B",
+      "pins": {
+        "A": {
+          "net": "n0057",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0058",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0059",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U45_and2_2": {
+      "cell_type": "and2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B",
+      "pins": {
+        "A": {
+          "net": "n0034",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0014",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0056",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U46_xor2_2": {
+      "cell_type": "xor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A ^ B",
+      "pins": {
+        "A": {
+          "net": "n0023",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0013",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0060",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U47_xor2_2": {
+      "cell_type": "xor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A ^ B",
+      "pins": {
+        "A": {
+          "net": "n0061",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0062",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0020",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U48_xor2_2": {
+      "cell_type": "xor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A ^ B",
+      "pins": {
+        "A": {
+          "net": "n0051",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0063",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0019",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U49_xor2_2": {
+      "cell_type": "xor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A ^ B",
+      "pins": {
+        "A": {
+          "net": "n0064",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0065",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0018",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U4_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0003",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0005",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0002",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U50_a31o_2": {
+      "cell_type": "a31o",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = (A1 & A2 & A3) | B1",
+      "pins": {
+        "A1": {
+          "net": "n0051",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0063",
+          "direction": "input",
+          "role": "data"
+        },
+        "A3": {
+          "net": "n0061",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1": {
+          "net": "n0066",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0053",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U51_or2_2": {
+      "cell_type": "or2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A | B",
+      "pins": {
+        "A": {
+          "net": "n0030",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0009",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0052",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U52_and2_2": {
+      "cell_type": "and2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B",
+      "pins": {
+        "A": {
+          "net": "n0037",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0010",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0067",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U53_and4bb_2": {
+      "cell_type": "and4bb",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = !A_N & !B_N & C & D",
+      "pins": {
+        "A_N": {
+          "net": "n0068",
+          "direction": "input",
+          "role": "data"
+        },
+        "B_N": {
+          "net": "n0059",
+          "direction": "input",
+          "role": "data"
+        },
+        "C": {
+          "net": "n0041",
+          "direction": "input",
+          "role": "data"
+        },
+        "D": {
+          "net": "n0021",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "S",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U54_or2_2": {
+      "cell_type": "or2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A | B",
+      "pins": {
+        "A": {
+          "net": "n0022",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0005",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0069",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U55_a21bo_2": {
+      "cell_type": "a21bo",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = (A1 & A2) | !B1_N",
+      "pins": {
+        "A1": {
+          "net": "n0064",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0065",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1_N": {
+          "net": "n0070",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0071",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U56_and2_2": {
+      "cell_type": "and2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B",
+      "pins": {
+        "A": {
+          "net": "n0032",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0003",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0044",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U57_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0048",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0067",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0061",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U58_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0047",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0044",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0072",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U59_a21o_2": {
+      "cell_type": "a21o",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = (A1 & A2) | B1",
+      "pins": {
+        "A1": {
+          "net": "n0051",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0063",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1": {
+          "net": "n0049",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0062",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U5_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0011",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0003",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0073",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U60_or2_2": {
+      "cell_type": "or2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A | B",
+      "pins": {
+        "A": {
+          "net": "n0037",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0010",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0074",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U61_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0035",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0011",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0050",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U62_nand2_2": {
+      "cell_type": "nand2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A & B)",
+      "pins": {
+        "A": {
+          "net": "n0054",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0052",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0075",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U63_and2_2": {
+      "cell_type": "and2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B",
+      "pins": {
+        "A": {
+          "net": "n0023",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0013",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0076",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U64_a31o_2": {
+      "cell_type": "a31o",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = (A1 & A2 & A3) | B1",
+      "pins": {
+        "A1": {
+          "net": "n0035",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0011",
+          "direction": "input",
+          "role": "data"
+        },
+        "A3": {
+          "net": "n0074",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1": {
+          "net": "n0067",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0066",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U65_or2_2": {
+      "cell_type": "or2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A | B",
+      "pins": {
+        "A": {
+          "net": "n0032",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0003",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0043",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U66_xnor2_2": {
+      "cell_type": "xnor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A ^ B)",
+      "pins": {
+        "A": {
+          "net": "n0075",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0053",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0038",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U67_a31o_2": {
+      "cell_type": "a31o",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = (A1 & A2 & A3) | B1",
+      "pins": {
+        "A1": {
+          "net": "n0064",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0065",
+          "direction": "input",
+          "role": "data"
+        },
+        "A3": {
+          "net": "n0072",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1": {
+          "net": "n0045",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0063",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U68_xor2_2": {
+      "cell_type": "xor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A ^ B",
+      "pins": {
+        "A": {
+          "net": "n0072",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0071",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0017",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U69_xnor2_2": {
+      "cell_type": "xnor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A ^ B)",
+      "pins": {
+        "A": {
+          "net": "n0077",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0055",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0039",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U6_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0009",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "n0010",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0008",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U70_nand2_2": {
+      "cell_type": "nand2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A & B)",
+      "pins": {
+        "A": {
+          "net": "n0030",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0009",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0054",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U71_nand2_2": {
+      "cell_type": "nand2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A & B)",
+      "pins": {
+        "A": {
+          "net": "n0022",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0005",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0070",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U72_nor2_2": {
+      "cell_type": "nor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A | B)",
+      "pins": {
+        "A": {
+          "net": "n0056",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0046",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0077",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U73_nand2_2": {
+      "cell_type": "nand2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A & B)",
+      "pins": {
+        "A": {
+          "net": "n0025",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0007",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0057",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U74_and2_2": {
+      "cell_type": "and2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B",
+      "pins": {
+        "A": {
+          "net": "n0069",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0070",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0065",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U75_a31o_2": {
+      "cell_type": "a31o",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = (A1 & A2 & A3) | B1",
+      "pins": {
+        "A1": {
+          "net": "n0025",
+          "direction": "input",
+          "role": "data"
+        },
+        "A2": {
+          "net": "n0007",
+          "direction": "input",
+          "role": "data"
+        },
+        "A3": {
+          "net": "n0060",
+          "direction": "input",
+          "role": "data"
+        },
+        "B1": {
+          "net": "n0076",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0064",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U76_xnor2_2": {
+      "cell_type": "xnor2",
+      "known_model": true,
+      "sequential": false,
+      "function": "Y = !(A ^ B)",
+      "pins": {
+        "A": {
+          "net": "n0057",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0060",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "Y": {
+          "net": "n0068",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U77_or2_2": {
+      "cell_type": "or2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A | B",
+      "pins": {
+        "A": {
+          "net": "n0025",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0007",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0058",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U78_and2_2": {
+      "cell_type": "and2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = A & B",
+      "pins": {
+        "A": {
+          "net": "n0035",
+          "direction": "input",
+          "role": "data"
+        },
+        "B": {
+          "net": "n0011",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0049",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U7_mux2_1": {
+      "cell_type": "mux2",
+      "known_model": true,
+      "sequential": false,
+      "function": "X = S ? A1 : A0",
+      "pins": {
+        "A0": {
+          "net": "n0007",
+          "direction": "input",
+          "role": "data"
+        },
+        "A1": {
+          "net": "A",
+          "direction": "input",
+          "role": "data"
+        },
+        "S": {
+          "net": "en",
+          "direction": "input",
+          "role": "data"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        },
+        "X": {
+          "net": "n0006",
+          "direction": "output",
+          "role": "data"
+        }
+      }
+    },
+    "U8_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0012",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0010",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    },
+    "U9_dfrtp_2": {
+      "cell_type": "dfrtp",
+      "known_model": true,
+      "sequential": true,
+      "function": "positive-edge D flip-flop; asynchronous active-low reset",
+      "pins": {
+        "CLK": {
+          "net": "n0001",
+          "direction": "input",
+          "role": "clock"
+        },
+        "D": {
+          "net": "n0073",
+          "direction": "input",
+          "role": "data"
+        },
+        "Q": {
+          "net": "n0011",
+          "direction": "output",
+          "role": "state"
+        },
+        "RESET_B": {
+          "net": "rst_n",
+          "direction": "input",
+          "role": "reset"
+        },
+        "VGND": {
+          "net": "VGND",
+          "direction": "power",
+          "role": "power"
+        },
+        "VPWR": {
+          "net": "VPWR",
+          "direction": "power",
+          "role": "power"
+        }
+      }
+    }
+  },
+  "nets": {
+    "A": {
+      "aliases": [
+        "A"
+      ],
+      "is_port": true,
+      "is_power": false,
+      "inferred_direction": "input",
+      "drivers": [],
+      "loads": [
+        "U7_mux2_1.A1"
+      ],
+      "unknowns": []
+    },
+    "B": {
+      "aliases": [
+        "B"
+      ],
+      "is_port": true,
+      "is_power": false,
+      "inferred_direction": "input",
+      "drivers": [],
+      "loads": [
+        "U22_mux2_1.A1"
+      ],
+      "unknowns": []
+    },
+    "S": {
+      "aliases": [
+        "S"
+      ],
+      "is_port": true,
+      "is_power": false,
+      "inferred_direction": "output",
+      "drivers": [
+        "U53_and4bb_2.X"
+      ],
+      "loads": [],
+      "unknowns": []
+    },
+    "VGND": {
+      "aliases": [
+        "VGND"
+      ],
+      "is_port": true,
+      "is_power": true,
+      "inferred_direction": "power",
+      "drivers": [],
+      "loads": [],
+      "unknowns": []
+    },
+    "VPWR": {
+      "aliases": [
+        "VPWR"
+      ],
+      "is_port": true,
+      "is_power": true,
+      "inferred_direction": "power",
+      "drivers": [],
+      "loads": [],
+      "unknowns": []
+    },
+    "clk": {
+      "aliases": [
+        "clk"
+      ],
+      "is_port": true,
+      "is_power": false,
+      "inferred_direction": "input",
+      "drivers": [],
+      "loads": [
+        "U0_clkbuf_16.A"
+      ],
+      "unknowns": []
+    },
+    "en": {
+      "aliases": [
+        "en"
+      ],
+      "is_port": true,
+      "is_power": false,
+      "inferred_direction": "input",
+      "drivers": [],
+      "loads": [
+        "U14_mux2_1.S",
+        "U15_mux2_1.S",
+        "U16_mux2_1.S",
+        "U17_mux2_1.S",
+        "U20_mux2_1.S",
+        "U21_mux2_1.S",
+        "U22_mux2_1.S",
+        "U27_mux2_1.S",
+        "U28_mux2_1.S",
+        "U29_mux2_1.S",
+        "U35_mux2_1.S",
+        "U36_mux2_1.S",
+        "U4_mux2_1.S",
+        "U5_mux2_1.S",
+        "U6_mux2_1.S",
+        "U7_mux2_1.S"
+      ],
+      "unknowns": []
+    },
+    "n0000": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U0_clkbuf_16.X"
+      ],
+      "loads": [
+        "U31_clkbuf_16.A",
+        "U3_clkbuf_16.A"
+      ],
+      "unknowns": []
+    },
+    "n0001": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U3_clkbuf_16.X"
+      ],
+      "loads": [
+        "U10_dfrtp_2.CLK",
+        "U11_dfrtp_2.CLK",
+        "U12_dfrtp_2.CLK",
+        "U13_dfrtp_2.CLK",
+        "U18_dfrtp_2.CLK",
+        "U19_dfrtp_2.CLK",
+        "U8_dfrtp_2.CLK",
+        "U9_dfrtp_2.CLK"
+      ],
+      "unknowns": []
+    },
+    "n0002": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U4_mux2_1.X"
+      ],
+      "loads": [
+        "U10_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0003": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U10_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U39_nor2_2.B",
+        "U4_mux2_1.A0",
+        "U56_and2_2.B",
+        "U5_mux2_1.A1",
+        "U65_or2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0004": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U15_mux2_1.X"
+      ],
+      "loads": [
+        "U11_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0005": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U11_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U15_mux2_1.A0",
+        "U37_a31o_2.A2",
+        "U4_mux2_1.A1",
+        "U54_or2_2.B",
+        "U71_nand2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0006": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U7_mux2_1.X"
+      ],
+      "loads": [
+        "U12_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0007": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U12_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U17_mux2_1.A1",
+        "U73_nand2_2.B",
+        "U75_a31o_2.A2",
+        "U77_or2_2.B",
+        "U7_mux2_1.A0"
+      ],
+      "unknowns": []
+    },
+    "n0008": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U6_mux2_1.X"
+      ],
+      "loads": [
+        "U13_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0009": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U13_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U16_mux2_1.A1",
+        "U51_or2_2.B",
+        "U6_mux2_1.A0",
+        "U70_nand2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0010": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U8_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U14_mux2_1.A0",
+        "U40_nor2_2.B",
+        "U52_and2_2.B",
+        "U60_or2_2.B",
+        "U6_mux2_1.A1"
+      ],
+      "unknowns": []
+    },
+    "n0011": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U9_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U14_mux2_1.A1",
+        "U5_mux2_1.A0",
+        "U61_nor2_2.B",
+        "U64_a31o_2.A2",
+        "U78_and2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0012": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U14_mux2_1.X"
+      ],
+      "loads": [
+        "U8_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0013": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U19_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U15_mux2_1.A1",
+        "U17_mux2_1.A0",
+        "U46_xor2_2.B",
+        "U63_and2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0014": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U18_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U16_mux2_1.A0",
+        "U38_nor2_2.B",
+        "U45_and2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0015": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U16_mux2_1.X"
+      ],
+      "loads": [
+        "U18_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0016": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U17_mux2_1.X"
+      ],
+      "loads": [
+        "U19_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0017": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U68_xor2_2.X"
+      ],
+      "loads": [
+        "U1_and4bb_2.A_N"
+      ],
+      "unknowns": []
+    },
+    "n0018": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U49_xor2_2.X"
+      ],
+      "loads": [
+        "U1_and4bb_2.B_N"
+      ],
+      "unknowns": []
+    },
+    "n0019": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U48_xor2_2.X"
+      ],
+      "loads": [
+        "U1_and4bb_2.C"
+      ],
+      "unknowns": []
+    },
+    "n0020": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U47_xor2_2.X"
+      ],
+      "loads": [
+        "U1_and4bb_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0021": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U1_and4bb_2.X"
+      ],
+      "loads": [
+        "U53_and4bb_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0022": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U26_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U20_mux2_1.A0",
+        "U36_mux2_1.A1",
+        "U37_a31o_2.A1",
+        "U54_or2_2.A",
+        "U71_nand2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0023": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U30_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U20_mux2_1.A1",
+        "U21_mux2_1.A0",
+        "U46_xor2_2.A",
+        "U63_and2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0024": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U20_mux2_1.X"
+      ],
+      "loads": [
+        "U26_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0025": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U33_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U21_mux2_1.A1",
+        "U22_mux2_1.A0",
+        "U73_nand2_2.A",
+        "U75_a31o_2.A1",
+        "U77_or2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0026": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U21_mux2_1.X"
+      ],
+      "loads": [
+        "U30_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0027": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U22_mux2_1.X"
+      ],
+      "loads": [
+        "U33_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0028": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U31_clkbuf_16.X"
+      ],
+      "loads": [
+        "U23_dfrtp_2.CLK",
+        "U24_dfrtp_2.CLK",
+        "U25_dfrtp_2.CLK",
+        "U26_dfrtp_2.CLK",
+        "U30_dfrtp_2.CLK",
+        "U32_dfrtp_2.CLK",
+        "U33_dfrtp_2.CLK",
+        "U34_dfrtp_2.CLK"
+      ],
+      "unknowns": []
+    },
+    "n0029": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U29_mux2_1.X"
+      ],
+      "loads": [
+        "U23_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0030": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U23_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U27_mux2_1.A1",
+        "U29_mux2_1.A0",
+        "U51_or2_2.A",
+        "U70_nand2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0031": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U36_mux2_1.X"
+      ],
+      "loads": [
+        "U24_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0032": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U24_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U28_mux2_1.A1",
+        "U36_mux2_1.A0",
+        "U39_nor2_2.A",
+        "U56_and2_2.A",
+        "U65_or2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0033": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U27_mux2_1.X"
+      ],
+      "loads": [
+        "U25_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0034": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U25_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U27_mux2_1.A0",
+        "U38_nor2_2.A",
+        "U45_and2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0035": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U34_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U28_mux2_1.A0",
+        "U35_mux2_1.A1",
+        "U61_nor2_2.A",
+        "U64_a31o_2.A1",
+        "U78_and2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0036": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U28_mux2_1.X"
+      ],
+      "loads": [
+        "U34_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0037": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U32_dfrtp_2.Q"
+      ],
+      "loads": [
+        "U29_mux2_1.A1",
+        "U35_mux2_1.A0",
+        "U40_nor2_2.A",
+        "U52_and2_2.A",
+        "U60_or2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0038": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U66_xnor2_2.Y"
+      ],
+      "loads": [
+        "U2_and3_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0039": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U69_xnor2_2.Y"
+      ],
+      "loads": [
+        "U2_and3_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0040": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U43_o21bai_2.Y"
+      ],
+      "loads": [
+        "U2_and3_2.C"
+      ],
+      "unknowns": []
+    },
+    "n0041": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U2_and3_2.X"
+      ],
+      "loads": [
+        "U53_and4bb_2.C"
+      ],
+      "unknowns": []
+    },
+    "n0042": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U35_mux2_1.X"
+      ],
+      "loads": [
+        "U32_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0043": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U65_or2_2.X"
+      ],
+      "loads": [
+        "U37_a31o_2.A3"
+      ],
+      "unknowns": []
+    },
+    "n0044": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U56_and2_2.X"
+      ],
+      "loads": [
+        "U37_a31o_2.B1",
+        "U58_nor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0045": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U37_a31o_2.X"
+      ],
+      "loads": [
+        "U67_a31o_2.B1"
+      ],
+      "unknowns": []
+    },
+    "n0046": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U38_nor2_2.Y"
+      ],
+      "loads": [
+        "U43_o21bai_2.A1",
+        "U72_nor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0047": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U39_nor2_2.Y"
+      ],
+      "loads": [
+        "U58_nor2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0048": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U40_nor2_2.Y"
+      ],
+      "loads": [
+        "U57_nor2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0049": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U78_and2_2.X"
+      ],
+      "loads": [
+        "U41_nor2_2.A",
+        "U59_a21o_2.B1"
+      ],
+      "unknowns": []
+    },
+    "n0050": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U61_nor2_2.Y"
+      ],
+      "loads": [
+        "U41_nor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0051": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U41_nor2_2.Y"
+      ],
+      "loads": [
+        "U48_xor2_2.A",
+        "U50_a31o_2.A1",
+        "U59_a21o_2.A1"
+      ],
+      "unknowns": []
+    },
+    "n0052": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U51_or2_2.X"
+      ],
+      "loads": [
+        "U42_a21boi_2.A1",
+        "U62_nand2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0053": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U50_a31o_2.X"
+      ],
+      "loads": [
+        "U42_a21boi_2.A2",
+        "U66_xnor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0054": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U70_nand2_2.Y"
+      ],
+      "loads": [
+        "U42_a21boi_2.B1_N",
+        "U62_nand2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0055": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U42_a21boi_2.Y"
+      ],
+      "loads": [
+        "U43_o21bai_2.A2",
+        "U69_xnor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0056": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U45_and2_2.X"
+      ],
+      "loads": [
+        "U43_o21bai_2.B1_N",
+        "U72_nor2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0057": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U73_nand2_2.Y"
+      ],
+      "loads": [
+        "U44_and2_2.A",
+        "U76_xnor2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0058": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U77_or2_2.X"
+      ],
+      "loads": [
+        "U44_and2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0059": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U44_and2_2.X"
+      ],
+      "loads": [
+        "U53_and4bb_2.B_N"
+      ],
+      "unknowns": []
+    },
+    "n0060": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U46_xor2_2.X"
+      ],
+      "loads": [
+        "U75_a31o_2.A3",
+        "U76_xnor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0061": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U57_nor2_2.Y"
+      ],
+      "loads": [
+        "U47_xor2_2.A",
+        "U50_a31o_2.A3"
+      ],
+      "unknowns": []
+    },
+    "n0062": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U59_a21o_2.X"
+      ],
+      "loads": [
+        "U47_xor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0063": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U67_a31o_2.X"
+      ],
+      "loads": [
+        "U48_xor2_2.B",
+        "U50_a31o_2.A2",
+        "U59_a21o_2.A2"
+      ],
+      "unknowns": []
+    },
+    "n0064": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U75_a31o_2.X"
+      ],
+      "loads": [
+        "U49_xor2_2.A",
+        "U55_a21bo_2.A1",
+        "U67_a31o_2.A1"
+      ],
+      "unknowns": []
+    },
+    "n0065": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U74_and2_2.X"
+      ],
+      "loads": [
+        "U49_xor2_2.B",
+        "U55_a21bo_2.A2",
+        "U67_a31o_2.A2"
+      ],
+      "unknowns": []
+    },
+    "n0066": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U64_a31o_2.X"
+      ],
+      "loads": [
+        "U50_a31o_2.B1"
+      ],
+      "unknowns": []
+    },
+    "n0067": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U52_and2_2.X"
+      ],
+      "loads": [
+        "U57_nor2_2.B",
+        "U64_a31o_2.B1"
+      ],
+      "unknowns": []
+    },
+    "n0068": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U76_xnor2_2.Y"
+      ],
+      "loads": [
+        "U53_and4bb_2.A_N"
+      ],
+      "unknowns": []
+    },
+    "n0069": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U54_or2_2.X"
+      ],
+      "loads": [
+        "U74_and2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0070": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U71_nand2_2.Y"
+      ],
+      "loads": [
+        "U55_a21bo_2.B1_N",
+        "U74_and2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0071": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U55_a21bo_2.X"
+      ],
+      "loads": [
+        "U68_xor2_2.B"
+      ],
+      "unknowns": []
+    },
+    "n0072": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U58_nor2_2.Y"
+      ],
+      "loads": [
+        "U67_a31o_2.A3",
+        "U68_xor2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0073": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U5_mux2_1.X"
+      ],
+      "loads": [
+        "U9_dfrtp_2.D"
+      ],
+      "unknowns": []
+    },
+    "n0074": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U60_or2_2.X"
+      ],
+      "loads": [
+        "U64_a31o_2.A3"
+      ],
+      "unknowns": []
+    },
+    "n0075": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U62_nand2_2.Y"
+      ],
+      "loads": [
+        "U66_xnor2_2.A"
+      ],
+      "unknowns": []
+    },
+    "n0076": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U63_and2_2.X"
+      ],
+      "loads": [
+        "U75_a31o_2.B1"
+      ],
+      "unknowns": []
+    },
+    "n0077": {
+      "aliases": [],
+      "is_port": false,
+      "is_power": false,
+      "inferred_direction": "internal",
+      "drivers": [
+        "U72_nor2_2.Y"
+      ],
+      "loads": [
+        "U69_xnor2_2.A"
+      ],
+      "unknowns": []
+    },
+    "rst_n": {
+      "aliases": [
+        "rst_n"
+      ],
+      "is_port": true,
+      "is_power": false,
+      "inferred_direction": "input",
+      "drivers": [],
+      "loads": [
+        "U10_dfrtp_2.RESET_B",
+        "U11_dfrtp_2.RESET_B",
+        "U12_dfrtp_2.RESET_B",
+        "U13_dfrtp_2.RESET_B",
+        "U18_dfrtp_2.RESET_B",
+        "U19_dfrtp_2.RESET_B",
+        "U23_dfrtp_2.RESET_B",
+        "U24_dfrtp_2.RESET_B",
+        "U25_dfrtp_2.RESET_B",
+        "U26_dfrtp_2.RESET_B",
+        "U30_dfrtp_2.RESET_B",
+        "U32_dfrtp_2.RESET_B",
+        "U33_dfrtp_2.RESET_B",
+        "U34_dfrtp_2.RESET_B",
+        "U8_dfrtp_2.RESET_B",
+        "U9_dfrtp_2.RESET_B"
+      ],
+      "unknowns": []
+    }
+  },
+  "abstractions": {
+    "shift_registers": [
+      {
+        "name": "shift_A",
+        "kind": "shift_register",
+        "width": 8,
+        "serial_input_net": "A",
+        "enable_net": "en",
+        "clock_net": "n0001",
+        "reset_net": "rst_n",
+        "parallel_output_nets": [
+          "n0007",
+          "n0013",
+          "n0005",
+          "n0003",
+          "n0011",
+          "n0010",
+          "n0009",
+          "n0014"
+        ],
+        "member_instances": [
+          "U10_dfrtp_2",
+          "U11_dfrtp_2",
+          "U12_dfrtp_2",
+          "U13_dfrtp_2",
+          "U14_mux2_1",
+          "U15_mux2_1",
+          "U16_mux2_1",
+          "U17_mux2_1",
+          "U18_dfrtp_2",
+          "U19_dfrtp_2",
+          "U4_mux2_1",
+          "U5_mux2_1",
+          "U6_mux2_1",
+          "U7_mux2_1",
+          "U8_dfrtp_2",
+          "U9_dfrtp_2"
+        ],
+        "stages": [
+          {
+            "index": 0,
+            "flip_flop": "U12_dfrtp_2",
+            "mux": "U7_mux2_1",
+            "q_net": "n0007",
+            "d_net": "n0006"
+          },
+          {
+            "index": 1,
+            "flip_flop": "U19_dfrtp_2",
+            "mux": "U17_mux2_1",
+            "q_net": "n0013",
+            "d_net": "n0016"
+          },
+          {
+            "index": 2,
+            "flip_flop": "U11_dfrtp_2",
+            "mux": "U15_mux2_1",
+            "q_net": "n0005",
+            "d_net": "n0004"
+          },
+          {
+            "index": 3,
+            "flip_flop": "U10_dfrtp_2",
+            "mux": "U4_mux2_1",
+            "q_net": "n0003",
+            "d_net": "n0002"
+          },
+          {
+            "index": 4,
+            "flip_flop": "U9_dfrtp_2",
+            "mux": "U5_mux2_1",
+            "q_net": "n0011",
+            "d_net": "n0073"
+          },
+          {
+            "index": 5,
+            "flip_flop": "U8_dfrtp_2",
+            "mux": "U14_mux2_1",
+            "q_net": "n0010",
+            "d_net": "n0012"
+          },
+          {
+            "index": 6,
+            "flip_flop": "U13_dfrtp_2",
+            "mux": "U6_mux2_1",
+            "q_net": "n0009",
+            "d_net": "n0008"
+          },
+          {
+            "index": 7,
+            "flip_flop": "U18_dfrtp_2",
+            "mux": "U16_mux2_1",
+            "q_net": "n0014",
+            "d_net": "n0015"
+          }
+        ],
+        "external_q_loads": {
+          "n0007": [
+            "U73_nand2_2.B",
+            "U75_a31o_2.A2",
+            "U77_or2_2.B"
+          ],
+          "n0013": [
+            "U46_xor2_2.B",
+            "U63_and2_2.B"
+          ],
+          "n0005": [
+            "U37_a31o_2.A2",
+            "U54_or2_2.B",
+            "U71_nand2_2.B"
+          ],
+          "n0003": [
+            "U39_nor2_2.B",
+            "U56_and2_2.B",
+            "U65_or2_2.B"
+          ],
+          "n0011": [
+            "U61_nor2_2.B",
+            "U64_a31o_2.A2",
+            "U78_and2_2.B"
+          ],
+          "n0010": [
+            "U40_nor2_2.B",
+            "U52_and2_2.B",
+            "U60_or2_2.B"
+          ],
+          "n0009": [
+            "U51_or2_2.B",
+            "U70_nand2_2.B"
+          ],
+          "n0014": [
+            "U38_nor2_2.B",
+            "U45_and2_2.B"
+          ]
+        },
+        "evidence": [
+          "exclusive point-to-point mux.X -> D wiring",
+          "exactly one self-feedback mux input per stage",
+          "single unbranched acyclic serial chain",
+          "uniform clock, reset, enable, and mux orientation",
+          "internal mux loads exactly match hold/shift wiring"
+        ]
+      },
+      {
+        "name": "shift_B",
+        "kind": "shift_register",
+        "width": 8,
+        "serial_input_net": "B",
+        "enable_net": "en",
+        "clock_net": "n0028",
+        "reset_net": "rst_n",
+        "parallel_output_nets": [
+          "n0025",
+          "n0023",
+          "n0022",
+          "n0032",
+          "n0035",
+          "n0037",
+          "n0030",
+          "n0034"
+        ],
+        "member_instances": [
+          "U20_mux2_1",
+          "U21_mux2_1",
+          "U22_mux2_1",
+          "U23_dfrtp_2",
+          "U24_dfrtp_2",
+          "U25_dfrtp_2",
+          "U26_dfrtp_2",
+          "U27_mux2_1",
+          "U28_mux2_1",
+          "U29_mux2_1",
+          "U30_dfrtp_2",
+          "U32_dfrtp_2",
+          "U33_dfrtp_2",
+          "U34_dfrtp_2",
+          "U35_mux2_1",
+          "U36_mux2_1"
+        ],
+        "stages": [
+          {
+            "index": 0,
+            "flip_flop": "U33_dfrtp_2",
+            "mux": "U22_mux2_1",
+            "q_net": "n0025",
+            "d_net": "n0027"
+          },
+          {
+            "index": 1,
+            "flip_flop": "U30_dfrtp_2",
+            "mux": "U21_mux2_1",
+            "q_net": "n0023",
+            "d_net": "n0026"
+          },
+          {
+            "index": 2,
+            "flip_flop": "U26_dfrtp_2",
+            "mux": "U20_mux2_1",
+            "q_net": "n0022",
+            "d_net": "n0024"
+          },
+          {
+            "index": 3,
+            "flip_flop": "U24_dfrtp_2",
+            "mux": "U36_mux2_1",
+            "q_net": "n0032",
+            "d_net": "n0031"
+          },
+          {
+            "index": 4,
+            "flip_flop": "U34_dfrtp_2",
+            "mux": "U28_mux2_1",
+            "q_net": "n0035",
+            "d_net": "n0036"
+          },
+          {
+            "index": 5,
+            "flip_flop": "U32_dfrtp_2",
+            "mux": "U35_mux2_1",
+            "q_net": "n0037",
+            "d_net": "n0042"
+          },
+          {
+            "index": 6,
+            "flip_flop": "U23_dfrtp_2",
+            "mux": "U29_mux2_1",
+            "q_net": "n0030",
+            "d_net": "n0029"
+          },
+          {
+            "index": 7,
+            "flip_flop": "U25_dfrtp_2",
+            "mux": "U27_mux2_1",
+            "q_net": "n0034",
+            "d_net": "n0033"
+          }
+        ],
+        "external_q_loads": {
+          "n0025": [
+            "U73_nand2_2.A",
+            "U75_a31o_2.A1",
+            "U77_or2_2.A"
+          ],
+          "n0023": [
+            "U46_xor2_2.A",
+            "U63_and2_2.A"
+          ],
+          "n0022": [
+            "U37_a31o_2.A1",
+            "U54_or2_2.A",
+            "U71_nand2_2.A"
+          ],
+          "n0032": [
+            "U39_nor2_2.A",
+            "U56_and2_2.A",
+            "U65_or2_2.A"
+          ],
+          "n0035": [
+            "U61_nor2_2.A",
+            "U64_a31o_2.A1",
+            "U78_and2_2.A"
+          ],
+          "n0037": [
+            "U40_nor2_2.A",
+            "U52_and2_2.A",
+            "U60_or2_2.A"
+          ],
+          "n0030": [
+            "U51_or2_2.A",
+            "U70_nand2_2.A"
+          ],
+          "n0034": [
+            "U38_nor2_2.A",
+            "U45_and2_2.A"
+          ]
+        },
+        "evidence": [
+          "exclusive point-to-point mux.X -> D wiring",
+          "exactly one self-feedback mux input per stage",
+          "single unbranched acyclic serial chain",
+          "uniform clock, reset, enable, and mux orientation",
+          "internal mux loads exactly match hold/shift wiring"
+        ]
+      }
+    ],
+    "shift_register_rejections": []
+  },
+  "validation_issues": []
+}
