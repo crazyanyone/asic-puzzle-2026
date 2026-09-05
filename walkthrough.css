@@ -118,6 +118,21 @@ button:hover { border-color: #c8c6bc; }
 .fold.code { background: var(--code); }
 .fold.output { margin-top: 8px; }
 
+.out-inline,
+.out-visual {
+  margin-top: 8px;
+}
+
+.out-inline pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.out-visual {
+  overflow-x: auto;
+}
+
 .fold-toggle {
   width: 22px;
   padding: 8px 0 0;
