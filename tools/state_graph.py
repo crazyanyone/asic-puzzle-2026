@@ -80,9 +80,10 @@ def classify_two_bit_sccs(
 ) -> tuple[list[TwoBitInfo], list[TwoBitInfo], list[TwoBitInfo], list[str]]:
     """Split 2-bit SCCs by combinational-cone size and collect singleton flops.
 
-    Returns ``(thin, fat, reused, loners)``. Each 2-bit record is
+    Returns ``(thin, fat, reused, singletons)``. Each 2-bit record is
     ``(pair, n_comb_cells, extra_state, has_mux)``, the same shape later
-    sections already read.
+    sections already read. ``singletons`` are the size-1 SCCs (1-bit
+    flags), with ``hide`` removed — usually the shift-register stages.
     """
     thin: list[TwoBitInfo] = []
     fat: list[TwoBitInfo] = []
@@ -112,12 +113,12 @@ def classify_two_bit_sccs(
         else:
             fat.append(info)
 
-    loners = [
+    singletons = [
         component[0]
         for component in sccs
         if len(component) == 1 and component[0] not in hide
     ]
-    return thin, fat, reused, loners
+    return thin, fat, reused, singletons
 
 
 def print_scc_inventory(
@@ -150,40 +151,69 @@ def print_scc_inventory(
         )
 
 
+def _comb_cells(design: Design, pair: set[str]) -> set[str]:
+    cells: set[str] = set()
+    for name in pair:
+        cells |= {
+            cell
+            for cell in design.backward_cone(
+                design.instances[name].pins["D"].net
+            ).cells
+            if not design.instances[cell].sequential
+        }
+    return cells
+
+
+def print_two_bit_report(
+    thin: list[TwoBitInfo],
+    fat: list[TwoBitInfo],
+    reused: list[TwoBitInfo],
+    design: Design | None = None,
+) -> None:
+    """Show why the 23 pairs split into tiny / muxed-tiny / fat."""
+    rows = (
+        [("tiny", info) for info in thin]
+        + [("tiny+mux", info) for info in reused]
+        + [("fat", info) for info in fat]
+    )
+    sizes: Counter[tuple[str, int, bool]] = Counter()
+    for kind, (_pair, n_comb, _extra, has_mux) in rows:
+        sizes[(kind, n_comb, has_mux)] += 1
+
+    print("combinational gates in each 2-bit FSM's D-cone:")
+    print(f"  {'kind':<8} {'gates':>5}  mux   how many")
+    for (kind, n_comb, has_mux), count in sorted(
+        sizes.items(), key=lambda item: (item[0][1], item[0][0])
+    ):
+        mux = "yes" if has_mux else "no"
+        print(f"  {kind:<8} {n_comb:>5}  {mux:<3}  {count}")
+
+    print()
+    print(f"tiny (a handful of gates, no mux):  {len(thin)}")
+    print(f"tiny, but includes a mux2:          {len(reused)}")
+    print(f"fat  (~150 gates):                  {len(fat)}")
+    if reused:
+        print("  muxed pair:", ", ".join(sorted(reused[0][0])))
+    if fat and design is not None:
+        fat_comb = [_comb_cells(design, pair) for pair, *_ in fat]
+        shared = set.intersection(*fat_comb)
+        union = set.union(*fat_comb)
+        print(
+            f"  fat cones share {len(shared)} of {len(union)} combinational cells"
+        )
+
+
 def print_two_bit_split(
     design: Design,
     thin: list[TwoBitInfo],
     fat: list[TwoBitInfo],
     reused: list[TwoBitInfo],
-    loners: list[str],
+    singletons: list[str],
 ) -> None:
-    print(f"tiny 2-bit SCCs (a handful of gates):     {len(thin)}")
-    print(f"tiny 2-bit SCC that also has a mux:       {len(reused)}")
-    print(f"fat  2-bit SCCs (~150 gates each):        {len(fat)}")
-    if fat:
-        fat_comb: list[set[str]] = []
-        for pair, *_ in fat:
-            cells: set[str] = set()
-            for name in pair:
-                cells |= {
-                    cell
-                    for cell in design.backward_cone(
-                        design.instances[name].pins["D"].net
-                    ).cells
-                    if not design.instances[cell].sequential
-                }
-            fat_comb.append(cells)
-        shared = set.intersection(*fat_comb)
-        union = set.union(*fat_comb)
-        print(
-            f"  shared combinational cells among fat ones: "
-            f"{len(shared)} / {len(union)}"
-        )
-
+    print_two_bit_report(thin, fat, reused, design)
     print()
-    print("the mux-y pair:", sorted(reused[0][0]) if reused else None)
-    print(f"singletons outside shift_I: {len(loners)}")
-    print("  ", ", ".join(sorted(loners)))
+    print(f"1-bit singletons outside shift_I: {len(singletons)}")
+    print("  ", ", ".join(sorted(singletons)))
     print()
     print(
         "and success is literally this flop's Q:",

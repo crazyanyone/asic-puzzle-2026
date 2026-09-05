@@ -4,8 +4,8 @@ import unittest
 from pathlib import Path
 
 from tools.netlist_ir import Design
-from tools.helpers.display import bit_trace_html, grid_html
-from tools.play import Play, as_bits, bits_at
+from tools.helpers.display import bit_trace_html, color_grid_html, grid_html
+from tools.play import Play, as_bits, bits_at, i_toggle_hits
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,6 +46,14 @@ class BitHelpersTests(unittest.TestCase):
         self.assertEqual(html.count("background:#e02424"), 2)
         with self.assertRaises(ValueError):
             bit_trace_html(trace, windows=[[0]], row_groups=[4, 4])
+
+    def test_color_grid_html_requires_121_labels(self) -> None:
+        with self.assertRaises(ValueError):
+            color_grid_html([0])
+        html = color_grid_html([i % 11 for i in range(121)], title="regions")
+        self.assertIn("regions", html)
+        self.assertIn("#4e79a7", html)
+        self.assertEqual(html.count("<div style="), 124)  # title + 2 wrappers + 121
 
 
 class ToyPlayTests(unittest.TestCase):

@@ -40,6 +40,99 @@ def show_grid(bits: str | Sequence[object], cell_px: int = 26) -> None:
     display(HTML(grid_html(bits, cell_px=cell_px)))
 
 
+def show_grids(
+    *labeled: tuple[str, str | Sequence[object]],
+    cell_px: int = 12,
+) -> None:
+    """Draw several 11×11 boards in one row (black = 1)."""
+    from IPython.display import HTML, display
+
+    blocks = []
+    for title, bits in labeled:
+        heading = (
+            f'<div style="font:12px Helvetica,sans-serif;margin:0 0 4px 0;">'
+            f"{title}</div>"
+        )
+        blocks.append(
+            f'<div style="display:inline-block;margin:0 16px 8px 0;vertical-align:top;">'
+            f"{heading}{grid_html(bits, cell_px=cell_px)}</div>"
+        )
+    display(HTML("".join(blocks)))
+
+
+_REGION_COLORS = (
+    "#4e79a7",
+    "#f28e2b",
+    "#e15759",
+    "#76b7b2",
+    "#59a14f",
+    "#edc948",
+    "#b07aa1",
+    "#ff9da7",
+    "#9c755f",
+    "#bab0ac",
+    "#8cd17d",
+)
+
+
+def _color_square(label: int, cell_px: int, colors: Sequence[str]) -> str:
+    if label < 0:
+        fill, edge = _OFF
+    else:
+        fill = colors[label % len(colors)]
+        edge = fill
+    return (
+        f'<div style="width:{cell_px}px;height:{cell_px}px;'
+        f"background:{fill};border:1px solid {edge};box-sizing:border-box;"
+        '"></div>'
+    )
+
+
+def color_grid_html(
+    labels: Sequence[int],
+    *,
+    cell_px: int = 18,
+    title: str = "",
+    colors: Sequence[str] = _REGION_COLORS,
+) -> str:
+    """HTML for an 11×11 grid colored by integer label. Negative = empty."""
+    if len(labels) != 121:
+        raise ValueError(f"expected 121 labels, got {len(labels)}")
+    squares = [_color_square(int(label), cell_px, colors) for label in labels]
+    grid = (
+        f'<div style="display:inline-grid;grid-template-columns:repeat(11,{cell_px}px);'
+        f'gap:2px;line-height:0;">{"".join(squares)}</div>'
+    )
+    heading = (
+        f'<div style="font:12px Helvetica,sans-serif;margin:0 0 4px 0;">{title}</div>'
+        if title
+        else ""
+    )
+    return (
+        f'<div style="display:inline-block;margin:0 18px 16px 0;vertical-align:top;">'
+        f"{heading}{grid}</div>"
+    )
+
+
+def show_color_grid(
+    labels: Sequence[int],
+    *,
+    cell_px: int = 18,
+    title: str = "",
+    colors: Sequence[str] = _REGION_COLORS,
+) -> None:
+    """Draw an 11×11 grid colored by integer label."""
+    from IPython.display import HTML, display
+
+    display(
+        HTML(
+            color_grid_html(
+                labels, cell_px=cell_px, title=title, colors=colors
+            )
+        )
+    )
+
+
 def bit_grid_html(
     rows: Sequence[Sequence[object]],
     *,

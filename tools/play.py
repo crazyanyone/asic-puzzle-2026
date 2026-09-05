@@ -6,7 +6,7 @@ lives in ``tools.circuit_eval``.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Collection, Iterable, Sequence
 from typing import Mapping
 
 from tools.circuit_eval import one_clock_transition, state_net_by_instance
@@ -14,10 +14,13 @@ from tools.helpers.bits import as_bits, bits_at
 from tools.helpers.display import (
     bit_grid_html,
     bit_trace_html,
+    color_grid_html,
     grid_html,
     show_bit_grid,
     show_bit_trace,
+    show_color_grid,
     show_grid,
+    show_grids,
 )
 from tools.netlist_ir import Design
 
@@ -27,10 +30,14 @@ __all__ = [
     "bit_grid_html",
     "bit_trace_html",
     "bits_at",
+    "color_grid_html",
     "grid_html",
+    "i_toggle_hits",
     "show_bit_grid",
     "show_bit_trace",
+    "show_color_grid",
     "show_grid",
+    "show_grids",
 ]
 
 
@@ -146,3 +153,29 @@ class Play:
             success_values.append(bool(result.outputs_after_edge[self.success]))
             state = result.next_state
         return byte_values, success_values
+
+
+def i_toggle_hits(
+    play: Play,
+    pairs: Sequence[Collection[str]],
+    length: int = 121,
+) -> list[set[int]]:
+    """Cells where flipping ``I`` changes a 2-bit pair's next state.
+
+    Walk the scan once. At each position, take one edge with ``I = 0`` and
+    one with ``I = 1`` from the same state. A pair "listens" here if any of
+    its flops would store a different bit.
+    """
+    hits = [set() for _ in pairs]
+    state = play.reset_state()
+    for position in range(length):
+        low = play.tick(state, True, False).next_state
+        high = play.tick(state, True, True).next_state
+        for index, pair in enumerate(pairs):
+            if any(
+                low[play.state_net[name]] != high[play.state_net[name]]
+                for name in pair
+            ):
+                hits[index].add(position)
+        state = low
+    return hits
