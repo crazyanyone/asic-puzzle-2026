@@ -4,7 +4,8 @@ import unittest
 from pathlib import Path
 
 from tools.netlist_ir import Design
-from tools.play import Play, as_bits, bits_at, grid_html
+from tools.helpers.display import bit_trace_html, grid_html
+from tools.play import Play, as_bits, bits_at
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,6 +26,26 @@ class BitHelpersTests(unittest.TestCase):
         html = grid_html(bits_at(0))
         self.assertIn("grid-template-columns:repeat(11,", html)
         self.assertEqual(html.count("<div style="), 122)  # 121 cells + wrapper
+
+    def test_bit_trace_html_labels_times_and_separates_windows(self) -> None:
+        trace = [[0, 1], [1, 0], [1, 1]]
+        html = bit_trace_html(trace, windows=[[0, 1], [2]], row_labels=["a", "b"])
+        self.assertIn(">0</div>", html)
+        self.assertIn(">1</div>", html)
+        self.assertIn(">2</div>", html)
+        self.assertIn(">a</div>", html)
+        self.assertIn("width:16px;flex:0 0 16px", html)
+        self.assertIn("overflow-x:auto", html)
+        self.assertIn("background:#c8c8c8", html)
+        with self.assertRaises(IndexError):
+            bit_trace_html(trace, windows=[[3]])
+
+    def test_bit_trace_html_draws_red_row_rules(self) -> None:
+        trace = [[0] * 9]
+        html = bit_trace_html(trace, windows=[[0]], row_groups=[4, 4, 1])
+        self.assertEqual(html.count("background:#e02424"), 2)
+        with self.assertRaises(ValueError):
+            bit_trace_html(trace, windows=[[0]], row_groups=[4, 4])
 
 
 class ToyPlayTests(unittest.TestCase):

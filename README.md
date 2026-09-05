@@ -62,16 +62,14 @@ reproducible snapshots, not additional sources of truth.
 
 ## Repository map
 
-- `tools/extract_netlist.py`: GDS geometry and union-find connectivity.
+- `tools/helpers/`: bit strings and HTML bit-grids.
+- `tools/play.py`, `tools/circuit_eval.py`: simulators (reset, tick, scan).
+- `tools/extract_netlist.py`, `tools/analyze_netlist.py`, `tools/inspect_gds.py`,
+  `tools/simulate_netlist.py`, `tools/check_influence.py`: command-line runners.
 - `tools/netlist_ir.py`: cell models and the queryable graph representation.
 - `tools/logic.py`: safe parser/evaluator for the Liberty Boolean subset.
+- `tools/state_graph.py`: flop dependency graphs and SCCs.
 - `tools/import_sky130_models.py`: refresh/check the official cell snapshot.
-- `tools/circuit_eval.py`: concrete Boolean evaluation and one-edge transitions.
-- `tools/play.py`: reset, scan a bit-string, replay an attempt, draw an 11×11 board.
-- `tools/simulate_netlist.py`: play input sequences through extracted state.
-- `tools/check_influence.py`: exhaustive small-cone influence checks.
-- `tools/analyze_netlist.py`: inspection, cones, register motifs, and DOT output.
-- `tools/inspect_gds.py`: quick GDS hierarchy/cell inventory.
 - `tests/fixtures/toy_nets.json`: a graph small enough to follow by hand.
 - `tests/`: focused motif tests plus a real warm-up re-extraction test.
 - `artifacts/netlists/`: reproducible extracted connectivity snapshots.

@@ -1,0 +1,44 @@
+digraph blocks {
+  rankdir=LR;
+  graph [fontname=Helvetica, labelloc=t, label="92 flops after collapsing shift_I and SCCs"];
+  node [fontname=Helvetica, shape=box];
+  I [shape=diamond];
+  en [shape=diamond, label="enable"];
+  suc [shape=diamond, label="success"];
+  O [shape=diamond, label="O[7:0]"];
+
+  shift [shape=box3d, label="shift_I\nShiftRegister[12]"];
+  hub [label="9-bit FSM"];
+  pairs [label="23 × 2-bit FSMs"];
+  chain [label="8 × 1-bit FSMs"];
+  U381 [label="U381"];
+  U26 [label="U26"];
+  U27 [label="U27"];
+  U410 [label="U410"];
+  pos [label="4-bit FSM"];
+  msg [label="8-bit FSM"];
+  U28 [label="U28"];
+
+  I -> shift;
+  en -> hub;
+  hub -> shift [label="n0005?"];
+  shift -> U381 [label="Q[0,9,10,11]"];
+  hub -> pairs;
+  hub -> chain;
+  hub -> U381;
+  hub -> U26;
+  hub -> U410;
+  I -> pairs;
+  I -> chain;
+  pairs -> U410;
+  pairs -> U27;
+  pairs -> U28;
+  chain -> U28;
+  U381 -> U28;
+  U26 -> pos;
+  U410 -> U28;
+  U28 -> suc;
+  hub -> pos;
+  pos -> msg;
+  msg -> O;
+}

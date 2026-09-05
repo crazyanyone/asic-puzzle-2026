@@ -1,8 +1,7 @@
-"""Notebook-facing helpers for clocking an extracted netlist.
+"""Notebook-facing simulator: reset, tick, scan, and replay.
 
-Low-level evaluation lives in ``tools.circuit_eval``. This module is the
-small API used by the walkthrough: reset, tick, scan a bit-string, replay
-an attempt, and draw a 121-bit word as an 11×11 board.
+Display helpers live in ``tools.helpers.display``. Low-level evaluation
+lives in ``tools.circuit_eval``.
 """
 
 from __future__ import annotations
@@ -11,49 +10,28 @@ from collections.abc import Iterable, Sequence
 from typing import Mapping
 
 from tools.circuit_eval import one_clock_transition, state_net_by_instance
+from tools.helpers.bits import as_bits, bits_at
+from tools.helpers.display import (
+    bit_grid_html,
+    bit_trace_html,
+    grid_html,
+    show_bit_grid,
+    show_bit_trace,
+    show_grid,
+)
 from tools.netlist_ir import Design
 
-
-def as_bits(bits: str | Sequence[object]) -> list[bool]:
-    """A ``'0101…'`` string, or a sequence of 0/1/bool, as a list of bool."""
-    if isinstance(bits, str):
-        return [ch == "1" for ch in bits]
-    return [bool(b) for b in bits]
-
-
-def bits_at(*positions: int, length: int = 121) -> str:
-    """Build a bit string with ``1`` at each given cell index."""
-    chars = ["0"] * length
-    for position in positions:
-        chars[position] = "1"
-    return "".join(chars)
-
-
-def grid_html(bits: str | Sequence[object], cell_px: int = 26) -> str:
-    """HTML for an 11×11 board (black = 1). Length must be 121."""
-    values = as_bits(bits)
-    if len(values) != 121:
-        raise ValueError(f"expected 121 bits, got {len(values)}")
-    squares = []
-    for bit in values:
-        fill = "#111" if bit else "#f2f2f2"
-        edge = "#111" if bit else "#c8c8c8"
-        squares.append(
-            f'<div style="width:{cell_px}px;height:{cell_px}px;'
-            f"background:{fill};border:1px solid {edge};box-sizing:border-box;"
-            '"></div>'
-        )
-    return (
-        f'<div style="display:inline-grid;grid-template-columns:repeat(11,{cell_px}px);'
-        f'gap:2px;line-height:0;">{"".join(squares)}</div>'
-    )
-
-
-def show_grid(bits: str | Sequence[object], cell_px: int = 26) -> None:
-    """Draw a 121-bit word as an 11×11 board (black = 1)."""
-    from IPython.display import HTML, display
-
-    display(HTML(grid_html(bits, cell_px=cell_px)))
+__all__ = [
+    "Play",
+    "as_bits",
+    "bit_grid_html",
+    "bit_trace_html",
+    "bits_at",
+    "grid_html",
+    "show_bit_grid",
+    "show_bit_trace",
+    "show_grid",
+]
 
 
 class Play:
