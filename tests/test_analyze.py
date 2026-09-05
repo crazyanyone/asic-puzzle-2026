@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.analyze_netlist import write_dot
+from tools.analyze_netlist import print_shift_registers, write_dot, write_shift_register_dot
 from tools.netlist_ir import Design
 
 
@@ -60,6 +60,37 @@ class AbstractVisualizationTests(unittest.TestCase):
         dot = self.render_dot(cells, nets, "Registers")
 
         self.assert_shift_registers_are_collapsed(dot)
+
+
+class ShiftRegisterReportTests(unittest.TestCase):
+    def test_print_is_compact(self) -> None:
+        design = Design.load(ROOT / "artifacts" / "netlists" / "warmup.json")
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            print_shift_registers(design, show_rejected=False, dot_path=None)
+        text = buffer.getvalue()
+        self.assertIn("Number of shift registers: 2", text)
+        self.assertIn("8 mux, 8 flip-flops", text)
+        self.assertNotIn("Rejected candidate", text)
+        self.assertNotIn("strict evidence", text)
+        self.assertNotIn("clock leaves", text)
+
+    def test_dot_fans_out_every_q_bit(self) -> None:
+        design = Design.load(ROOT / "artifacts" / "netlists" / "puzzle.json")
+        shift_registers = design.strict_shift_registers().shift_registers
+        self.assertEqual(len(shift_registers), 1)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "shift.dot"
+            with contextlib.redirect_stdout(io.StringIO()):
+                write_shift_register_dot(design, shift_registers, str(path))
+            dot = path.read_text()
+        self.assertNotIn("parallel Q", dot)
+        for index in (0, 9, 10, 11):
+            self.assertIn(f'"q:shift_I:{index}"', dot)
+        for index in range(1, 9):
+            self.assertNotIn(f'"q:shift_I:{index}"', dot)
+        self.assertIn("U360_a22o_2", dot)
+        self.assertIn("U374_a221o_2", dot)
 
 
 if __name__ == "__main__":

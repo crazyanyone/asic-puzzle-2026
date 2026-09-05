@@ -42,7 +42,11 @@ def natural_key(value: str) -> tuple[object, ...]:
 
 
 def quoted(value: str) -> str:
-    return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    return (
+        '"'
+        + value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+        + '"'
+    )
 
 
 def terminal_list(terminals: list[Terminal]) -> str:
@@ -123,7 +127,7 @@ def write_dot(
     for cell_name in sorted(visible_cells, key=natural_key):
         instance = design.instances[cell_name]
         shape = "doubleoctagon" if instance.sequential else "box"
-        label = f"{instance.name}\\n{instance.cell_type}"
+        label = f"{instance.name}\n{instance.cell_type}"
         lines.append(
             f"  {quoted('cell:' + cell_name)} "
             f"[shape={shape}, label={quoted(label)}];"
@@ -135,8 +139,8 @@ def write_dot(
             for q_net in shift_register.parallel_output_nets
         )
         label = (
-            f"{shift_register.name}\\nShiftRegister[{shift_register.width}]"
-            f"\\n{touched_bits} visible Q bits"
+            f"{shift_register.name}\nShiftRegister[{shift_register.width}]"
+            f"\n{touched_bits} visible Q bits"
         )
         lines.append(
             f"  {quoted('block:' + shift_register.name)} "
@@ -209,72 +213,122 @@ def write_dot(
     print(f"Render with: dot -Tsvg {output_path} -o {svg_path}")
 
 
+def member_summary(design: Design, shift_register: ShiftRegister) -> str:
+    muxes = 0
+    flip_flops = 0
+    other = 0
+    for name in shift_register.member_instances:
+        instance = design.instances[name]
+        if instance.sequential:
+            flip_flops += 1
+        elif instance.cell_type.startswith("mux"):
+            muxes += 1
+        else:
+            other += 1
+    parts: list[str] = []
+    if muxes:
+        parts.append(f"{muxes} mux")
+    if flip_flops:
+        parts.append(f"{flip_flops} flip-flops")
+    if other:
+        parts.append(f"{other} other")
+    return ", ".join(parts) or "none"
+
+
 def write_shift_register_dot(
     design: Design,
     shift_registers: list[ShiftRegister],
     output_path: str,
 ) -> None:
-    """Write a high-level graph containing one node per proven abstraction."""
+    """Draw each register as one block plus the Q bits that leave it.
+
+    Bits that only feed the next mux inside the register are omitted.
+    External taps continue one hop to the first cell that reads them.
+    """
     lines = [
         "digraph shift_registers {",
         "  rankdir=LR;",
-        "  graph [fontname=\"Helvetica\", labelloc=t];",
+        "  graph [fontname=\"Helvetica\", labelloc=t, nodesep=0.18, ranksep=0.55];",
         "  node [fontname=\"Helvetica\"];",
         "  edge [fontname=\"Helvetica\", fontsize=9];",
-        '  label="Strict shift-register abstractions";',
+        '  label="Shift registers";',
     ]
     emitted_nets: set[str] = set()
+    emitted_cells: set[str] = set()
 
     def emit_net(net_name: str) -> str:
         node_id = "net:" + net_name
         if net_name not in emitted_nets:
             emitted_nets.add(net_name)
             net = design.nets[net_name]
-            label = (
-                "|".join(net.aliases)
-                if net.is_port
-                else design.source_description(net_name)
-            )
+            label = "|".join(net.aliases) if net.is_port else net.name
             lines.append(
                 f"  {quoted(node_id)} [shape=diamond, label={quoted(label)}];"
+            )
+        return node_id
+
+    def emit_cell(instance_name: str) -> str:
+        node_id = "cell:" + instance_name
+        if instance_name not in emitted_cells:
+            emitted_cells.add(instance_name)
+            instance = design.instances[instance_name]
+            label = f"{instance.name}\n{instance.cell_type}"
+            lines.append(
+                f"  {quoted(node_id)} [shape=box, label={quoted(label)}];"
             )
         return node_id
 
     for shift_register in shift_registers:
         block_id = "block:" + shift_register.name
         block_label = (
-            f"{shift_register.name}\\nShiftRegister[{shift_register.width}]"
+            f"{shift_register.name}\nShiftRegister[{shift_register.width}]"
         )
         lines.append(
             f"  {quoted(block_id)} "
             f"[shape=box3d, label={quoted(block_label)}];"
         )
-        controls = [
+        for role, net_name in (
             ("serial", shift_register.serial_input_net),
             ("enable", shift_register.enable_net),
             ("clock", shift_register.clock_net),
-        ]
-        if shift_register.reset_net is not None:
-            controls.append(("reset", shift_register.reset_net))
-        for role, net_name in controls:
+        ):
             net_id = emit_net(net_name)
             lines.append(
                 f"  {quoted(net_id)} -> {quoted(block_id)} "
                 f"[label={quoted(role)}];"
             )
 
-        output_id = "outputs:" + shift_register.name
-        output_label = (
-            f"{shift_register.name}.Q[{shift_register.width - 1}:0]\\n"
-            f"{sum(bool(loads) for loads in shift_register.external_q_loads.values())} "
-            "externally used taps"
-        )
-        lines.append(
-            f"  {quoted(output_id)} [shape=ellipse, label={quoted(output_label)}];"
-        )
-        lines.append(
-            f"  {quoted(block_id)} -> {quoted(output_id)} [label=\"parallel Q\"];"
-        )
+        q_ids: list[str] = []
+        for index, stage in enumerate(shift_register.stages):
+            loads = shift_register.external_q_loads[stage.q_net]
+            if not loads:
+                continue
+            q_id = f"q:{shift_register.name}:{index}"
+            q_ids.append(q_id)
+            q_label = f"Q[{index}]\n{stage.q_net}"
+            lines.append(
+                f"  {quoted(q_id)} [shape=ellipse, label={quoted(q_label)}];"
+            )
+            lines.append(f"  {quoted(block_id)} -> {quoted(q_id)};")
+            for load_name in loads:
+                instance_name, pin = load_name.rsplit(".", 1)
+                first_edge = instance_name not in emitted_cells
+                dest_id = emit_cell(instance_name)
+                constraint = "" if first_edge else ", constraint=false"
+                lines.append(
+                    f"  {quoted(q_id)} -> {quoted(dest_id)} "
+                    f"[label={quoted(pin)}{constraint}];"
+                )
+
+        if len(q_ids) > 1:
+            lines.append("  {")
+            lines.append("    rank=same;")
+            lines.append(
+                "    "
+                + " -> ".join(quoted(q_id) for q_id in q_ids)
+                + " [style=invis];"
+            )
+            lines.append("  }")
 
     lines.append("}")
     dot_path = Path(output_path)
@@ -582,40 +636,17 @@ def print_shift_registers(
     dot_path: str | None,
 ) -> None:
     analysis = design.strict_shift_registers()
-    print(f"Strict shift-register abstractions: {len(analysis.shift_registers)}")
-    print(f"Rejected candidate groups:          {len(analysis.rejections)}")
+    print(f"Number of shift registers: {len(analysis.shift_registers)}")
     print()
 
     for shift_register in analysis.shift_registers:
-        serial_source = design.source_description(
-            shift_register.serial_input_net
-        )
         print(f"{shift_register.name}: ShiftRegister[{shift_register.width}]")
-        print(f"  serial input: {serial_source}")
+        print(
+            f"  serial input: {design.source_description(shift_register.serial_input_net)}"
+        )
         print(f"  enable:       {shift_register.enable_net}")
         print(f"  clock:        {shift_register.clock_net}")
-        if shift_register.clock_leaf_nets != (shift_register.clock_net,):
-            print(
-                "  clock leaves: "
-                + ", ".join(shift_register.clock_leaf_nets)
-            )
-        print(f"  reset:        {shift_register.reset_net or '(none)'}")
-        print(
-            "  transition:   "
-            f"on clock, if {shift_register.enable_net}, "
-            "Q[i+1] <- Q[i] and Q[0] <- serial input"
-        )
-        print(f"  members:      {len(shift_register.member_instances)} instances")
-        print("  stages:")
-        for index, stage in enumerate(shift_register.stages):
-            external_loads = shift_register.external_q_loads[stage.q_net]
-            print(
-                f"    [{index}] {stage.flip_flop} + {stage.mux}; "
-                f"Q={stage.q_net}; external loads={len(external_loads)}"
-            )
-        print("  strict evidence:")
-        for evidence in shift_register.evidence:
-            print(f"    - {evidence}")
+        print(f"  members:      {member_summary(design, shift_register)}")
         print()
 
     if show_rejected and analysis.rejections:

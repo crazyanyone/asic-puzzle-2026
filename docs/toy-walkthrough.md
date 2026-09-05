@@ -20,10 +20,10 @@ may connect one driver to many loads.
 
 ## 2. Recover instances and pin directions
 
-Split every terminal at the final dot. `M0_mux2.A1` means instance `M0_mux2`,
-cell type `mux2`, pin `A1`. The checked-in cell-model snapshot says that `A0`,
-`A1`, and `S` are inputs and `X` is an output. Doing this for all terminals
-turns each net into drivers and loads.
+`M0_mux2.A1` means instance `M0_mux2`,  
+cell type `mux2`, pin `A1`. The cell type definition says that `A0`,  
+`A1`, and `S` are inputs and `X` is an output. Doing this for all the pins connected  
+to each net allows us to identify drivers and loads
 
 ```mermaid
 flowchart LR
@@ -43,6 +43,8 @@ flowchart LR
   AND --> success([success])
 ```
 
+
+
 Generate the same primitive graph from the code:
 
 ```bash
@@ -53,6 +55,8 @@ dot -Tsvg docs/diagrams/toy-shift-chain.dot \
   -o docs/diagrams/toy-shift-chain.svg
 ```
 
+
+
 ## 3. Translate each cell into an equation
 
 The Boolean functions now come from the official Sky130 Liberty snapshot:
@@ -62,9 +66,6 @@ d0      = (!en & q0) | (en & din)
 d1      = (!en & q1) | (en & q0)
 success = q1 & !q0
 ```
-
-The `d` values are ordinary combinational wires. They do not become state until
-the active clock edge.
 
 ## 4. Construct the one-clock transition relation
 
@@ -86,12 +87,14 @@ still just one simultaneous clock update. Both right-hand sides use **old**
 
 Even this tiny truth table exercises the generic combinational evaluator:
 
-| q1 | q0 | success = q1 & !q0 |
-|---:|---:|---:|
-| 0 | 0 | 0 |
-| 0 | 1 | 0 |
-| 1 | 0 | 1 |
-| 1 | 1 | 0 |
+
+| q1  | q0  | success = q1 & !q0 |
+| --- | --- | ------------------ |
+| 0   | 0   | 0                  |
+| 0   | 1   | 0                  |
+| 1   | 0   | 1                  |
+| 1   | 1   | 0                  |
+
 
 The evaluator recursively asks for the driver of `success`, evaluates the AND,
 asks for its input nets, evaluates the inverter where necessary, and stops at
@@ -115,6 +118,8 @@ edge 2: q0 1->0, q1 0->1, success 0->1
 edge 3: q0 0->1, q1 1->0, success 1->0
 edge 4: q0 1->1, q1 0->1, success 0->0
 ```
+
+
 
 ## 7. Recognize and verify the abstraction
 

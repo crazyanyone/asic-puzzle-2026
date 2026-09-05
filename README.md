@@ -67,6 +67,7 @@ reproducible snapshots, not additional sources of truth.
 - `tools/logic.py`: safe parser/evaluator for the Liberty Boolean subset.
 - `tools/import_sky130_models.py`: refresh/check the official cell snapshot.
 - `tools/circuit_eval.py`: concrete Boolean evaluation and one-edge transitions.
+- `tools/play.py`: reset, scan a bit-string, replay an attempt, draw an 11×11 board.
 - `tools/simulate_netlist.py`: play input sequences through extracted state.
 - `tools/check_influence.py`: exhaustive small-cone influence checks.
 - `tools/analyze_netlist.py`: inspection, cones, register motifs, and DOT output.
