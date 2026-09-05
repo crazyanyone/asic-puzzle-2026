@@ -272,7 +272,6 @@ def extract(gds_path: str, top_name: str | None = None) -> ExtractionResult:
         net_members[next(iter(roots))].add(terminal)
 
     # Name nets using top-level port labels where possible.
-    print("naming nets from top-level ports...", file=sys.stderr)
     net_names: dict[object, set[str]] = defaultdict(set)
     alias_roots: dict[str, set[object]] = defaultdict(set)
     unresolved_ports: set[str] = set()
@@ -296,8 +295,10 @@ def extract(gds_path: str, top_name: str | None = None) -> ExtractionResult:
         aliases = ", ".join(sorted(duplicate_aliases))
         raise ValueError(f"top-level labels occur on multiple nets: {aliases}")
 
-    print(f"  unresolved pins: {len(unresolved_pins)}", file=sys.stderr)
-    print(f"  unresolved ports: {len(unresolved_ports)}", file=sys.stderr)
+    if unresolved_pins:
+        print(f"  unresolved pins: {len(unresolved_pins)}", file=sys.stderr)
+    if unresolved_ports:
+        print(f"  unresolved ports: {len(unresolved_ports)}", file=sys.stderr)
     return ExtractionResult(
         source_gds=str(gds_path),
         top_cell=top.name,
@@ -324,14 +325,16 @@ def main() -> int:
         return 1
 
     rows = result.rows()
-    print(f"\n=== {len(rows)} nets extracted ===\n")
-    for net_id, aliases, members in rows:
-        is_power = bool(POWER_NAMES & set(aliases))
-        tag = " [power]" if is_power else ""
-        print(f"net {net_id}{tag}  ({len(members)} terminals)")
-        for m in members:
-            print(f"    {m}")
+    print(f"\n=== {len(rows)} nets extracted ===")
+    if not args.json:
         print()
+        for net_id, aliases, members in rows:
+            is_power = bool(POWER_NAMES & set(aliases))
+            tag = " [power]" if is_power else ""
+            print(f"net {net_id}{tag}  ({len(members)} terminals)")
+            for m in members:
+                print(f"    {m}")
+            print()
 
     if args.json:
         output_path = Path(args.json)

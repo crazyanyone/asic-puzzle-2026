@@ -1,0 +1,31 @@
+digraph named {
+  rankdir=LR;
+  graph [fontname=Helvetica, labelloc=t, label="named blocks"];
+  node [fontname=Helvetica, shape=box];
+  I [shape=diamond];
+  en [shape=diamond, label="enable"];
+  suc [shape=diamond, label="success"];
+
+  scan [shape=box3d, label="Row/Column tracker\ncol 0..10, row 0..10, done"];
+  shift [shape=box3d, label="shift_I[12]"];
+  adj [label="Adj\nsticky, 8-neighbor"];
+  rowc [label="Row-Star-Count[2]\nreused every 11"];
+  cols [label="11 × Col-Star-Count[2]"];
+  regs [label="11 × Region-Star-Count[2]"];
+  pop [label="Total Star Count [8]"];
+  bad [label="Row-failure flag"];
+  u28 [label="U28  AND of all flags"];
+
+  en -> scan;
+  I -> shift;
+  scan -> shift [label="enable & !done"];
+  shift -> adj [label="taps 1,10,11,12"];
+  I -> rowc; scan -> rowc;
+  I -> cols; scan -> cols;
+  I -> regs; scan -> regs;
+  I -> pop;  scan -> pop;
+  rowc -> bad;
+  adj -> u28; bad -> u28; rowc -> u28;
+  cols -> u28; regs -> u28; pop -> u28; scan -> u28;
+  u28 -> suc;
+}

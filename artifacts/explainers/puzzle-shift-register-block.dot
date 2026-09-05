@@ -1,0 +1,32 @@
+digraph shift_registers {
+  rankdir=LR;
+  graph [fontname="Helvetica", labelloc=t, nodesep=0.18, ranksep=0.55];
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica", fontsize=9];
+  label="Shift registers";
+  "block:shift_I" [shape=box3d, label="shift_I\nShiftRegister[12]"];
+  "net:I" [shape=diamond, label="I"];
+  "net:I" -> "block:shift_I" [label="serial"];
+  "net:n0005" [shape=diamond, label="n0005"];
+  "net:n0005" -> "block:shift_I" [label="enable"];
+  "net:clk" [shape=diamond, label="clk"];
+  "net:clk" -> "block:shift_I" [label="clock"];
+  "q:shift_I:0" [shape=ellipse, label="Q[0]\nn0342"];
+  "block:shift_I" -> "q:shift_I:0";
+  "cell:U360_a22o_2" [shape=box, label="U360_a22o_2\na22o"];
+  "q:shift_I:0" -> "cell:U360_a22o_2" [label="A2"];
+  "q:shift_I:9" [shape=ellipse, label="Q[9]\nn0364"];
+  "block:shift_I" -> "q:shift_I:9";
+  "cell:U374_a221o_2" [shape=box, label="U374_a221o_2\na221o"];
+  "q:shift_I:9" -> "cell:U374_a221o_2" [label="A2"];
+  "q:shift_I:10" [shape=ellipse, label="Q[10]\nn0366"];
+  "block:shift_I" -> "q:shift_I:10";
+  "q:shift_I:10" -> "cell:U374_a221o_2" [label="B2", constraint=false];
+  "q:shift_I:11" [shape=ellipse, label="Q[11]\nn0344"];
+  "block:shift_I" -> "q:shift_I:11";
+  "q:shift_I:11" -> "cell:U360_a22o_2" [label="B2", constraint=false];
+  {
+    rank=same;
+    "q:shift_I:0" -> "q:shift_I:9" -> "q:shift_I:10" -> "q:shift_I:11" [style=invis];
+  }
+}

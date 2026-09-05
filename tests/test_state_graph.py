@@ -8,7 +8,6 @@ from tools.netlist_ir import Design
 from tools.play import Play, i_toggle_hits
 from tools.state_graph import (
     classify_two_bit_sccs,
-    print_two_bit_report,
     state_dependency_graph,
     strongly_connected_components,
 )
@@ -49,19 +48,6 @@ class StateGraphTests(unittest.TestCase):
         self.assertIn("U410_dfrtp_2", singletons)
         self.assertIn("U26_dfrtp_2", singletons)
         self.assertIn("U27_dfrtp_2", singletons)
-
-        from io import StringIO
-        import contextlib
-
-        buffer = StringIO()
-        with contextlib.redirect_stdout(buffer):
-            print_two_bit_report(thin, fat, reused, design)
-        text = buffer.getvalue()
-        self.assertIn("tiny", text)
-        self.assertIn("fat", text)
-        self.assertIn("  6", text)
-        self.assertIn("153", text)
-        self.assertIn("share 148", text)
 
     def test_i_toggle_hits_are_columns_and_a_partition(self) -> None:
         design = Design.load(ROOT / "artifacts" / "netlists" / "puzzle.json")

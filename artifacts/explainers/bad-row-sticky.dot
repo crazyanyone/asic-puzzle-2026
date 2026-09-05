@@ -1,0 +1,39 @@
+digraph bad_row {
+  rankdir=LR;
+  graph [fontname=Helvetica, pad=0.3, nodesep=0.4, ranksep=0.8];
+  node [fontname=Helvetica];
+  edge [fontname=Helvetica, fontsize=10];
+
+  I [shape=diamond];
+  col10 [shape=box, label="U349\ncol == 10"];
+  scan [shape=box, label="U351\nenable & !done"];
+
+  subgraph cluster_row {
+    label="row count";
+    style=rounded;
+    color="#6d9eeb";
+    u407 [shape=box, style=filled, fillcolor="#cfe2f3", label="U407\nMSB"];
+    u411 [shape=box, style=filled, fillcolor="#cfe2f3", label="U411\nLSB"];
+  }
+
+  nand [shape=box, label="U421\n~(LSB & I)"];
+  or   [shape=box, label="U419\nLSB OR I"];
+  mux  [shape=record, style=filled, fillcolor="#fff2cc",
+        label="{{<a0>A0|<a1>A1|<s>S}|U418 mux2|<x>X}"];
+  a31o [shape=box, label="U412 a31o\n(A1 & A2 & A3) OR B1"];
+  u410 [shape=record, style=filled, fillcolor="#f4cccc",
+        label="{<d>D|U410 row-failure flag|<q>Q}"];
+
+  u407 -> mux:s [label=S];
+  u411 -> nand;
+  I -> nand;
+  u411 -> or;
+  I -> or;
+  nand -> mux:a0;
+  or -> mux:a1;
+  mux:x -> a31o [label="A3  row ≠ 2"];
+  col10 -> a31o [label=A1];
+  scan -> a31o [label=A2];
+  a31o -> u410:d [label=D];
+  u410:q -> a31o [label="B1 = Q", style=bold];
+}

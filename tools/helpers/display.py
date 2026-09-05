@@ -3,8 +3,23 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 
 from tools.helpers.bits import as_bits
+
+_DOT_COLORS = (
+    "#f4cccc",
+    "#fce5cd",
+    "#fff2cc",
+    "#d9ead3",
+    "#d0e0e3",
+    "#cfe2f3",
+    "#d9d2e9",
+    "#ead1dc",
+    "#c9daf8",
+    "#b6d7a8",
+    "#ffe599",
+)
 
 _ON = ("#111", "#111")
 _OFF = ("#f2f2f2", "#c8c8c8")
@@ -114,6 +129,41 @@ def color_grid_html(
     )
 
 
+def write_grid_dot(
+    path: str | Path,
+    regions: Sequence[Sequence[int]],
+    stars: Sequence[int] | frozenset[int] | set[int] = frozenset(),
+) -> None:
+    """Write an 11×11 neato graph: cells colored by region, optional star marks."""
+    if len(regions) != 11 or any(len(row) != 11 for row in regions):
+        raise ValueError("regions must be an 11×11 map")
+    occupied = set(stars)
+    lines = [
+        "graph grid {",
+        "layout=neato;",
+        "overlap=false;",
+        "splines=false;",
+        'node [shape=square, fixedsize=true, width=0.46, height=0.46, '
+        "fontname=Helvetica, fontsize=16];",
+        'edge [color="#999999", penwidth=0.6];',
+    ]
+    for row in range(11):
+        for column in range(11):
+            position = row * 11 + column
+            label = "*" if position in occupied else ""
+            color = _DOT_COLORS[regions[row][column] % len(_DOT_COLORS)]
+            lines.append(
+                f'n{position} [pos="{column},{10 - row}!", label="{label}", '
+                f'style=filled, fillcolor="{color}"];'
+            )
+            if column:
+                lines.append(f"n{position - 1} -- n{position};")
+            if row:
+                lines.append(f"n{position - 11} -- n{position};")
+    lines.append("}")
+    Path(path).write_text("\n".join(lines) + "\n")
+
+
 def show_color_grid(
     labels: Sequence[int],
     *,
@@ -175,6 +225,85 @@ def bit_grid_html(
         f"{heading}"
         f'<div style="display:flex;align-items:start;">{label_block}{grid}</div>'
         "</div>"
+    )
+
+
+def bit_strip_html(
+    bits: str | Sequence[object],
+    *,
+    n: int = 11,
+    cell_px: int = 14,
+    show_count: bool = True,
+) -> str:
+    """A 1×n black/white strip, optionally with the number of 1s."""
+    values = as_bits(bits)[:n]
+    squares = [_square(bit, cell_px) for bit in values]
+    strip = (
+        f'<div style="display:inline-grid;grid-template-columns:repeat({n},{cell_px}px);'
+        f'gap:2px;line-height:0;">{"".join(squares)}</div>'
+    )
+    if not show_count:
+        return strip
+    ones = sum(1 for bit in values if bit)
+    return f'{strip}<span style="margin-left:8px;color:#555;">{ones}</span>'
+
+
+def row_wrap_table_html(
+    rows: Sequence[tuple[str | Sequence[object], str, str]],
+    *,
+    input_label: str = "A particular row",
+    mid_label: str = "FSM state while<br>column counter = 10",
+    after_label: str = "FSM state after column counter resets to zero",
+    cell_px: int = 14,
+) -> str:
+    """HTML table: input strip plus two FSM bit-string columns."""
+    th = (
+        "font:12px Helvetica,sans-serif;font-weight:600;text-align:center;"
+        "padding:6px 12px;border-bottom:1px solid #ccc;"
+    )
+    td = (
+        "font:13px Helvetica,sans-serif;text-align:center;"
+        "padding:8px 12px;vertical-align:middle;"
+    )
+    lines = [
+        '<table style="border-collapse:collapse;">',
+        "<tr>",
+        f'<th style="{th}text-align:left;">{input_label}</th>',
+        f'<th style="{th}">{mid_label}</th>',
+        f'<th style="{th}">{after_label}</th>',
+        "</tr>",
+    ]
+    for bits, mid, after in rows:
+        lines.append(
+            f'<tr><td style="{td}text-align:left;">{bit_strip_html(bits, cell_px=cell_px)}</td>'
+            f'<td style="{td}">{mid}</td>'
+            f'<td style="{td}">{after}</td></tr>'
+        )
+    lines.append("</table>")
+    return "".join(lines)
+
+
+def show_row_wrap_table(
+    rows: Sequence[tuple[str | Sequence[object], str, str]],
+    *,
+    input_label: str = "A particular row",
+    mid_label: str = "FSM state while<br>column counter = 10",
+    after_label: str = "FSM state after column counter resets to zero",
+    cell_px: int = 14,
+) -> None:
+    """Draw the row-wrap comparison table (black = 1)."""
+    from IPython.display import HTML, display
+
+    display(
+        HTML(
+            row_wrap_table_html(
+                rows,
+                input_label=input_label,
+                mid_label=mid_label,
+                after_label=after_label,
+                cell_px=cell_px,
+            )
+        )
     )
 
 

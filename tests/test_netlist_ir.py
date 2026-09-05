@@ -157,5 +157,19 @@ class StrictShiftRegisterTests(unittest.TestCase):
         self.assertTrue(any("chain branches" in reason for reason in reasons), reasons)
 
 
+class ResolveInstanceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.design = Design.load(ROOT / "artifacts" / "netlists" / "puzzle.json")
+
+    def test_short_id_does_not_eat_longer_numbers(self) -> None:
+        self.assertEqual(self.design.resolve_instance("U28").name, "U28_dfrtp_2")
+        self.assertEqual(self.design.resolve_instance("U280").name, "U280_xnor2_2")
+
+    def test_unknown_instance_raises(self) -> None:
+        with self.assertRaises(KeyError):
+            self.design.resolve_instance("U99999")
+
+
 if __name__ == "__main__":
     unittest.main()

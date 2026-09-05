@@ -4,11 +4,45 @@ import unittest
 from pathlib import Path
 
 from tools.netlist_ir import Design
-from tools.helpers.display import bit_trace_html, color_grid_html, grid_html
+from tools.helpers.display import (
+    bit_strip_html,
+    bit_trace_html,
+    color_grid_html,
+    grid_html,
+    row_wrap_table_html,
+    write_grid_dot,
+)
+from tools.helpers.vcd import inputs_at_rising_clock_edge
 from tools.play import Play, as_bits, bits_at, i_toggle_hits
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+class VcdHelpersTests(unittest.TestCase):
+    def test_inputs_at_rising_clock_edge_reads_example_vcd(self) -> None:
+        samples = inputs_at_rising_clock_edge(ROOT / "example_inputs.vcd")
+        self.assertGreater(len(samples), 0)
+        self.assertIn("clk", samples[0])
+        self.assertIn("I", samples[0])
+        self.assertTrue(all(sample["clk"] == 1 for sample in samples))
+
+        attempts, current = [], []
+        for sample in samples:
+            if sample["enable"]:
+                current.append(bool(sample["I"]))
+            elif current:
+                attempts.append(current)
+                current = []
+        if current:
+            attempts.append(current)
+        self.assertEqual([len(bits) for bits in attempts], [121, 121])
+
+    def test_inputs_at_rising_clock_edge_requires_clock(self) -> None:
+        with self.assertRaises(ValueError):
+            inputs_at_rising_clock_edge(
+                ROOT / "example_inputs.vcd", clock="nope"
+            )
 
 
 class BitHelpersTests(unittest.TestCase):
@@ -54,6 +88,29 @@ class BitHelpersTests(unittest.TestCase):
         self.assertIn("regions", html)
         self.assertIn("#4e79a7", html)
         self.assertEqual(html.count("<div style="), 124)  # title + 2 wrappers + 121
+
+    def test_row_wrap_table_html_shows_strip_and_bit_states(self) -> None:
+        html = row_wrap_table_html([("10100000000", "10", "00")])
+        self.assertIn("grid-template-columns:repeat(11,", html)
+        self.assertIn(">2</span>", html)
+        self.assertIn(">10</td>", html)
+        self.assertIn(">00</td>", html)
+        strip = bit_strip_html("110", n=3, show_count=False)
+        self.assertNotIn("</span>", strip)
+
+    def test_write_grid_dot_marks_stars_and_pins_cells(self) -> None:
+        import tempfile
+
+        regions = [[c % 11 for c in range(11)] for _ in range(11)]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "grid.dot"
+            write_grid_dot(path, regions, stars={0, 12})
+            text = path.read_text()
+        self.assertIn('pos="0,10!"', text)
+        self.assertIn('label="*"', text)
+        self.assertIn("n0 -- n1", text)
+        with self.assertRaises(ValueError):
+            write_grid_dot(path, [[0]])
 
 
 class ToyPlayTests(unittest.TestCase):

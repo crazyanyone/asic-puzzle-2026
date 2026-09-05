@@ -13,14 +13,18 @@ from tools.circuit_eval import one_clock_transition, state_net_by_instance
 from tools.helpers.bits import as_bits, bits_at
 from tools.helpers.display import (
     bit_grid_html,
+    bit_strip_html,
     bit_trace_html,
     color_grid_html,
     grid_html,
+    row_wrap_table_html,
     show_bit_grid,
     show_bit_trace,
     show_color_grid,
     show_grid,
     show_grids,
+    show_row_wrap_table,
+    write_grid_dot,
 )
 from tools.netlist_ir import Design
 
@@ -28,16 +32,20 @@ __all__ = [
     "Play",
     "as_bits",
     "bit_grid_html",
+    "bit_strip_html",
     "bit_trace_html",
     "bits_at",
     "color_grid_html",
     "grid_html",
     "i_toggle_hits",
+    "row_wrap_table_html",
     "show_bit_grid",
     "show_bit_trace",
     "show_color_grid",
     "show_grid",
     "show_grids",
+    "show_row_wrap_table",
+    "write_grid_dot",
 ]
 
 

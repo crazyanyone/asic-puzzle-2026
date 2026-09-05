@@ -671,11 +671,21 @@ class Design:
     def resolve_instance(self, name: str) -> Instance:
         if name in self.instances:
             return self.instances[name]
-        matches = [instance for key, instance in self.instances.items() if key.startswith(name)]
+        # ``U28`` must not match ``U280_…``. Treat ``_`` as the end of the
+        # instance number so a short id is a unique prefix of ``U28_dfrtp_2``.
+        matches = [
+            instance
+            for key, instance in self.instances.items()
+            if key == name or key.startswith(f"{name}_")
+        ]
         if len(matches) == 1:
             return matches[0]
         if matches:
-            raise KeyError(f"Ambiguous instance prefix {name!r}")
+            shown = ", ".join(sorted(instance.name for instance in matches)[:8])
+            extra = "" if len(matches) <= 8 else f", … ({len(matches)} total)"
+            raise KeyError(
+                f"Ambiguous instance prefix {name!r}: {shown}{extra}"
+            )
         raise KeyError(f"Unknown instance: {name}")
 
     def signal_terminals(self, instance: Instance) -> list[Terminal]:
