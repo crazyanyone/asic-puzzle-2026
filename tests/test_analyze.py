@@ -6,7 +6,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.analyze_netlist import print_shift_registers, write_dot, write_shift_register_dot
+from tools.analyze_netlist import (
+    print_instance,
+    print_net,
+    print_shift_registers,
+    write_dot,
+    write_gate_inputs_dot,
+    write_shift_register_dot,
+)
 from tools.netlist_ir import Design
 
 
@@ -91,6 +98,60 @@ class ShiftRegisterReportTests(unittest.TestCase):
             self.assertNotIn(f'"q:shift_I:{index}"', dot)
         self.assertIn("U360_a22o_2", dot)
         self.assertIn("U374_a221o_2", dot)
+
+    def test_gate_inputs_dot_shows_every_pin(self) -> None:
+        design = Design.load(ROOT / "artifacts" / "netlists" / "puzzle.json")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "inputs.dot"
+            with contextlib.redirect_stdout(io.StringIO()):
+                write_gate_inputs_dot(
+                    design, ["U360_a22o_2", "U374_a221o_2"], str(path)
+                )
+            dot = path.read_text()
+        for pin in ("A1", "A2", "B1", "B2", "C1"):
+            self.assertIn(f"[label=\"{pin}\"]", dot)
+        self.assertIn("U416_or4_2", dot)
+        self.assertIn("U415_or4bb_2", dot)
+        self.assertIn("U422_conb_1", dot)
+        self.assertIn("Q[0]", dot)
+        self.assertIn("Q[11]", dot)
+
+
+class NetReportTests(unittest.TestCase):
+    def test_drivers_flag_omits_loads(self) -> None:
+        design = Design.load(ROOT / "artifacts" / "netlists" / "puzzle.json")
+        full = io.StringIO()
+        with contextlib.redirect_stdout(full):
+            print_net(design, "n0005", depth=1, dot_path=None)
+        drivers = io.StringIO()
+        with contextlib.redirect_stdout(drivers):
+            print_net(design, "n0005", depth=1, dot_path=None, driver_only=True)
+        full_text = full.getvalue()
+        driver_text = drivers.getvalue()
+        self.assertIn("Drivers:", full_text)
+        self.assertIn("Loads:", full_text)
+        self.assertIn("Grouped loads:", full_text)
+        self.assertIn("Driver:", driver_text)
+        self.assertNotIn("Drivers:", driver_text)
+        self.assertIn("U351_and2b_2.X", driver_text)
+        self.assertNotIn("Aliases:", driver_text)
+        self.assertNotIn("Port:", driver_text)
+        self.assertNotIn("Direction:", driver_text)
+        self.assertNotIn("Loads:", driver_text)
+        self.assertNotIn("Grouped loads:", driver_text)
+
+    def test_inputs_flag_omits_function_and_outputs(self) -> None:
+        design = Design.load(ROOT / "artifacts" / "netlists" / "puzzle.json")
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            print_instance(
+                design, "U351", depth=1, dot_path=None, inputs_only=True
+            )
+        text = buffer.getvalue()
+        self.assertIn("Instance:   U351_and2b_2", text)
+        self.assertIn("<-", text)
+        self.assertNotIn("Function:", text)
+        self.assertNotIn(" -> ", text)
 
 
 if __name__ == "__main__":

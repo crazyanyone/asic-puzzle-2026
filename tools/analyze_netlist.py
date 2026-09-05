@@ -339,6 +339,114 @@ def write_shift_register_dot(
     print(f"Render with: dot -Tsvg {output_path} -o {svg_path}")
 
 
+def _shift_q_index(design: Design, flop_name: str) -> tuple[str, int] | None:
+    for shift_register in design.strict_shift_registers().shift_registers:
+        for index, stage in enumerate(shift_register.stages):
+            if stage.flip_flop == flop_name:
+                return shift_register.name, index
+    return None
+
+
+def write_gate_inputs_dot(
+    design: Design,
+    instance_names: list[str],
+    output_path: str,
+) -> None:
+    """Draw every data pin of the named gates and the cell that drives it."""
+    gates = [design.resolve_instance(name) for name in instance_names]
+    gate_names = {gate.name for gate in gates}
+    lines = [
+        "digraph gate_inputs {",
+        "  rankdir=LR;",
+        "  graph [fontname=\"Helvetica\", labelloc=t, nodesep=0.25, ranksep=0.7];",
+        "  node [fontname=\"Helvetica\"];",
+        "  edge [fontname=\"Helvetica\", fontsize=9];",
+        '  label="All data inputs";',
+    ]
+    emitted: set[str] = set()
+
+    def emit_gate(instance: Instance) -> str:
+        node_id = "gate:" + instance.name
+        if node_id not in emitted:
+            emitted.add(node_id)
+            formula = ""
+            if instance.model.output_functions:
+                formula = "\n" + instance.model.output_functions[0][1]
+            label = f"{instance.name}\n{instance.cell_type}{formula}"
+            lines.append(
+                f"  {quoted(node_id)} [shape=box, label={quoted(label)}];"
+            )
+        return node_id
+
+    def emit_driver(terminal: Terminal) -> str:
+        instance = design.instances[terminal.instance]
+        tap = _shift_q_index(design, instance.name)
+        if tap is not None:
+            sr_name, index = tap
+            node_id = f"q:{sr_name}:{index}"
+            if node_id not in emitted:
+                emitted.add(node_id)
+                lines.append(
+                    f"  {quoted(node_id)} "
+                    f"[shape=ellipse, label={quoted(f'Q[{index}]')}];"
+                )
+            return node_id
+        if instance.cell_type == "conb":
+            node_id = "const:" + instance.name + ":" + terminal.pin
+            if node_id not in emitted:
+                emitted.add(node_id)
+                value = "1" if terminal.pin == "HI" else "0"
+                label = f"{instance.name}\n{terminal.pin} = {value}"
+                lines.append(
+                    f"  {quoted(node_id)} [shape=diamond, label={quoted(label)}];"
+                )
+            return node_id
+        if instance.name in gate_names:
+            return emit_gate(instance)
+        node_id = "cell:" + instance.name
+        if node_id not in emitted:
+            emitted.add(node_id)
+            label = f"{instance.name}\n{instance.cell_type}"
+            lines.append(
+                f"  {quoted(node_id)} [shape=box, label={quoted(label)}];"
+            )
+        return node_id
+
+    for gate in gates:
+        dest_id = emit_gate(gate)
+        for pin in gate.model.inputs:
+            terminal = gate.pins[pin]
+            net = design.nets[terminal.net]
+            if not net.drivers:
+                node_id = "net:" + net.name
+                if node_id not in emitted:
+                    emitted.add(node_id)
+                    label = "|".join(net.aliases) if net.is_port else net.name
+                    lines.append(
+                        f"  {quoted(node_id)} "
+                        f"[shape=diamond, label={quoted(label)}];"
+                    )
+                lines.append(
+                    f"  {quoted(node_id)} -> {quoted(dest_id)} "
+                    f"[label={quoted(pin)}];"
+                )
+                continue
+            for driver in net.drivers:
+                src_id = emit_driver(driver)
+                lines.append(
+                    f"  {quoted(src_id)} -> {quoted(dest_id)} "
+                    f"[label={quoted(pin)}];"
+                )
+
+    lines.append("}")
+    dot_path = Path(output_path)
+    dot_path.parent.mkdir(parents=True, exist_ok=True)
+    dot_path.write_text("\n".join(lines) + "\n")
+    svg_path = dot_path.with_suffix(".svg")
+    print(f"Wrote {output_path}")
+    print(f"Render with: dot -Tsvg {output_path} -o {svg_path}")
+
+
 def print_summary(design: Design) -> None:
     signal_nets = [net for net in design.nets.values() if not net.is_power]
     sequential = [instance for instance in design.instances.values() if instance.sequential]
@@ -379,26 +487,32 @@ def print_net(
     requested_name: str,
     depth: int,
     dot_path: str | None,
+    driver_only: bool = False,
 ) -> None:
     net = design.resolve_net(requested_name)
     print(f"Net:        {net.name}")
-    print(f"Aliases:    {', '.join(net.aliases)}")
-    print(f"Port:       {net.is_port}")
-    print(f"Direction:  {net.inferred_direction}")
-    print(f"Drivers:    {terminal_list(net.drivers)}")
-    print(f"Loads:      {terminal_list(net.loads)}")
-    if net.unknowns:
-        print(f"Unknowns:   {terminal_list(net.unknowns)}")
+    if driver_only:
+        print(f"Driver:     {terminal_list(net.drivers)}")
+    else:
+        print(f"Aliases:    {', '.join(net.aliases)}")
+        print(f"Port:       {net.is_port}")
+        print(f"Direction:  {net.inferred_direction}")
+        print(f"Drivers:    {terminal_list(net.drivers)}")
+        print(f"Loads:      {terminal_list(net.loads)}")
+        if net.unknowns:
+            print(f"Unknowns:   {terminal_list(net.unknowns)}")
 
-    grouped: dict[tuple[str, str, str], list[str]] = defaultdict(list)
-    for terminal in net.loads:
-        instance = design.instances[terminal.instance]
-        grouped[(instance.cell_type, terminal.pin, terminal.role)].append(instance.name)
-    if grouped:
-        print()
-        print("Grouped loads:")
-        for (cell_type, pin, role), names in sorted(grouped.items()):
-            print(f"  {len(names):>4} × {cell_type}.{pin:<12} role={role}")
+        grouped: dict[tuple[str, str, str], list[str]] = defaultdict(list)
+        for terminal in net.loads:
+            instance = design.instances[terminal.instance]
+            grouped[(instance.cell_type, terminal.pin, terminal.role)].append(
+                instance.name
+            )
+        if grouped:
+            print()
+            print("Grouped loads:")
+            for (cell_type, pin, role), names in sorted(grouped.items()):
+                print(f"  {len(names):>4} × {cell_type}.{pin:<12} role={role}")
 
     if dot_path:
         cells, nets = design.net_neighborhood(net.name, depth)
@@ -431,16 +545,25 @@ def print_instance(
     requested_name: str,
     depth: int,
     dot_path: str | None,
+    inputs_only: bool = False,
 ) -> None:
     instance = design.resolve_instance(requested_name)
-    print(instance_title(instance))
-    print(f"Function: {instance.model.function or '(not recorded)'}")
-    print()
-    for terminal in sorted(
-        design.signal_terminals(instance),
-        key=lambda item: (item.direction != "input", item.pin),
-    ):
-        print("  " + pin_connection_description(design, instance, terminal))
+    terminals = [
+        terminal
+        for terminal in design.signal_terminals(instance)
+        if not inputs_only or terminal.direction == "input"
+    ]
+    terminals.sort(key=lambda item: (item.direction != "input", item.pin))
+    if inputs_only:
+        print(f"Instance:   {instance.name}")
+        for terminal in terminals:
+            print("  " + pin_connection_description(design, instance, terminal))
+    else:
+        print(instance_title(instance))
+        print(f"Function: {instance.model.function or '(not recorded)'}")
+        print()
+        for terminal in terminals:
+            print("  " + pin_connection_description(design, instance, terminal))
 
     if dot_path:
         cells, nets = design.neighborhood(instance.name, depth)
@@ -686,6 +809,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--depth", type=int, default=1, help="Neighborhood radius for DOT output"
     )
     net_parser.add_argument("--dot", help="Write neighborhood as Graphviz DOT")
+    net_parser.add_argument(
+        "--driver",
+        action="store_true",
+        help="Print only the net name and its driver",
+    )
 
     instance_parser = subparsers.add_parser(
         "instance", help="Describe one instance and optionally draw its neighborhood"
@@ -695,6 +823,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--depth", type=int, default=1, help="Neighborhood radius for DOT output"
     )
     instance_parser.add_argument("--dot", help="Write neighborhood as Graphviz DOT")
+    instance_parser.add_argument(
+        "--inputs",
+        action="store_true",
+        help="Print only the instance name and its input pins",
+    )
 
     cone_parser = subparsers.add_parser(
         "cone", help="Trace the backward combinational cone of a net"
@@ -730,6 +863,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--dot", help="Write a high-level abstraction graph as DOT"
     )
 
+    gate_inputs_parser = subparsers.add_parser(
+        "gate-inputs",
+        help="Draw every data input of one or more gates",
+    )
+    gate_inputs_parser.add_argument(
+        "names", nargs="+", help="Instance name or unique prefix"
+    )
+    gate_inputs_parser.add_argument(
+        "--dot", required=True, help="Write the input graph as DOT"
+    )
+
     export_parser = subparsers.add_parser(
         "export", help="Write the derived semantic structure as JSON"
     )
@@ -745,9 +889,13 @@ def main() -> int:
         if args.command == "summary":
             print_summary(design)
         elif args.command == "net":
-            print_net(design, args.name, args.depth, args.dot)
+            print_net(
+                design, args.name, args.depth, args.dot, args.driver
+            )
         elif args.command == "instance":
-            print_instance(design, args.name, args.depth, args.dot)
+            print_instance(
+                design, args.name, args.depth, args.dot, args.inputs
+            )
         elif args.command == "cone":
             print_cone(design, args.target, not args.through_flops, args.dot)
         elif args.command == "registers":
@@ -760,6 +908,8 @@ def main() -> int:
                 args.show_rejected,
                 args.dot,
             )
+        elif args.command == "gate-inputs":
+            write_gate_inputs_dot(design, args.names, args.dot)
         elif args.command == "export":
             export_design(design, args.out)
         else:
