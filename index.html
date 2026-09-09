@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="walkthrough-revision" content="928fcf0">
+  <meta name="walkthrough-revision" content="56927b5">
   <title>Reverse Engineering an ASIC</title>
-  <link rel="stylesheet" href="walkthrough.css?v=928fcf0">
+  <link rel="stylesheet" href="walkthrough.css?v=56927b5">
 </head>
 <body>
   <header class="toolbar">
     <div class="toolbar-title">ASIC walkthrough</div>
-    <div class="toolbar-note">From master 928fcf0 · static notebook outputs</div>
+    <div class="toolbar-note">From master 56927b5 · static notebook outputs</div>
     <div class="toolbar-actions">
       <button type="button" id="collapse-all">Collapse all</button>
       <button type="button" id="expand-all">Expand all</button>
@@ -33,7 +33,7 @@
 <p>Certainly looks interesting, but not too interpretable. Zooming in reveals metal wires, vias (joining wires across layers), and individual transistors. Fortunately, the file stores objects at the granularity of cell types: it places instances of SKY130 cells such as AND gates, multiplexers, and flip-flops at specified coordiantes. The definitions of all the cell types can be found in the <a href="https://skywater-pdk.readthedocs.io/en/main/contents/libraries.html">SKY130 PDK</a>.</p>
 <p>The first plan of attack is then to just see what cell types this gds file contains:</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">6</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">26 lines of code</div><div class="fold-body"><pre># Compact view of: python -m tools.inspect_gds puzzle.gds
+<article class="cell code"><div class="gutter"><span class="count">42</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">26 lines of code</div><div class="fold-body"><pre># Compact view of: python -m tools.inspect_gds puzzle.gds
 from collections import Counter
 
 import gdstk
@@ -80,8 +80,8 @@ A few cell types and occurring frequencies:
 <h2>2. Connectivity</h2>
 <p>The GDS file gives us the location of the pins of each gate and all metal conductors. On each layer, we merge touching wires into connected regions. Then we merge regions on adjacent layers wherever a via connects them, into one giant conducting net. Next, go through every pin on every gate and find out which net it touches, and assemble into a big list of nets and pins.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">12</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">2 lines of code</div><div class="fold-body"><pre># Extract nets from the gds. This can take a little while.
-!.venv/bin/python -m tools.extract_netlist puzzle.gds --json generated/puzzle.json</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">17 lines of output</div><div class="fold-body"><pre class="out-stream stdout">top cell: puzzle
+<article class="cell code"><div class="gutter"><span class="count">43</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">2 lines of code</div><div class="fold-body"><pre># Extract nets from the gds. This can take a little while.
+!.venv/bin/python -m tools.extract_netlist puzzle.gds --json generated/puzzle.json</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of output</div><div class="fold-body"><pre class="out-stream stdout">top cell: puzzle
 merging conductor layers...
   li1   raw=13931  merged regions=6680
   met1  raw=14366  merged regions=3001
@@ -98,8 +98,9 @@ stitching layers through vias...
 assigning pins to nets...
 
 === 741 nets extracted ===
+wrote generated/puzzle.json
 </pre></div></div></div></div></article>
-<article class="cell code"><div class="gutter"><span class="count">7</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">11 lines of code</div><div class="fold-body"><pre># Look at a few extracted nets, skip over the massive VGND and VPWR nets, they just provide power.
+<article class="cell code"><div class="gutter"><span class="count">44</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">11 lines of code</div><div class="fold-body"><pre># Look at a few extracted nets, skip over the massive VGND and VPWR nets, they just provide power.
 import json
 from pathlib import Path
 
@@ -140,11 +141,12 @@ n0012 {
 </pre></div></div></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>A record such as <code>U119_clkbuf_4.A</code> means pin <code>A</code> of a particular clock-buffer instance touches that net. Cell model definitions from the official SKY130 Liberty data tell us pin directions and the Boolean functions they implement. If all is well, each net should have a single pin driving it, and all other pins receiving that as input. We can form a directed bipartite graph: gate outputs drive net nodes, and net nodes fan out to gate inputs - while sanity checking that each net have exactly one driver.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">4</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!.venv/bin/python -m tools.analyze_netlist {ListOfNets} summary</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">25 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Source:          generated/puzzle.json
+<article class="cell code"><div class="gutter"><span class="count">45</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!.venv/bin/python -m tools.analyze_netlist {ListOfNets} summary</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">92 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Source:          generated/puzzle.json
 Instances:       728
 Nets:            741 (739 non-power)
 Terminals:       4223
 State elements:  92
+Shift registers: 1 strictly verified
 
 Ports (direction inferred from cell pin directions):
   I                input             drivers=0  loads=45
@@ -163,6 +165,72 @@ Ports (direction inferred from cell pin directions):
   rst_n            input             drivers=0  loads=88
   success          output            drivers=1  loads=4
 
+Cell inventory:
+     84  dfrtp
+     49  nor2
+     39  nand2
+     32  clkbuf
+     31  o21a
+     30  and2b
+     29  xnor2
+     26  a31o
+     26  and3
+     25  inv
+     24  nand2b
+     23  a22o
+     21  mux2
+     21  xor2
+     20  a21oi
+     19  a21o
+     18  or3
+     17  and2
+     15  nand4
+     14  and4bb
+     13  or2
+     12  o211a
+     11  o31a
+     10  or4
+      9  or4b
+      8  and4
+      6  a221o
+      6  conb
+      6  o21ai
+      5  a211o
+      5  a32o
+      5  nor3b
+      4  a21boi
+      4  and3b
+      4  and4b
+      4  dfstp
+      4  dfxtp
+      4  nor3
+      4  o22a
+      4  o32a
+      3  a211oi
+      3  o221a
+      2  a21bo
+      2  a311o
+      2  nand3
+      2  nor4
+      2  nor4b
+      2  o21ba
+      2  o22ai
+      2  o311a
+      2  o31ai
+      1  a2111oi
+      1  a221oi
+      1  a22oi
+      1  a31oi
+      1  a41oi
+      1  buf
+      1  nand3b
+      1  o211ai
+      1  o21bai
+      1  o2bb2a
+      1  o32ai
+      1  or3b
+      1  or4bb
+
 Validation issues: 1
   - undriven internal net n0550
 </pre></div></div></div></div></article>
@@ -173,14 +241,72 @@ Validation issues: 1
 
 <p>If you want to render this yourself, the code is provided in the next cell. There's no way we're making sense of this with the eyeball test. A tiny &quot;success&quot; node is visible at the top right. We must smartly query this graph in small sections to try and infer its function.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">5</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">3 lines of code</div><div class="fold-body"><pre># Reproduce the  graph shown above.
+<article class="cell code"><div class="gutter"><span class="count">46</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">3 lines of code</div><div class="fold-body"><pre># Reproduce the  graph shown above.
 !python -m tools.analyze_netlist {ListOfNets} cone success --through-flops --dot generated/puzzle-success-backwards-cone.dot
-!dot -Tsvg generated/puzzle-success-backwards-cone.dot -o generated/puzzle-success-backwards-cone.svg</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">zsh:1: command not found: python
-</pre></div></div></article>
+!dot -Tsvg generated/puzzle-success-backwards-cone.dot -o generated/puzzle-success-backwards-cone.svg</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">59 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Target net:         success
+Cells in cone:      468
+Combinational:      389
+State boundaries:   0
+Nets visited:       470
+
+
+Combinational cells:
+     34  nor2
+     30  nand2
+     28  o21a
+     23  a31o
+     20  and2b
+     20  mux2
+     17  inv
+     17  nand2b
+     14  a21o
+     14  and3
+     14  nand4
+     13  and2
+     12  a21oi
+     12  and4bb
+     12  xnor2
+     12  xor2
+     10  or4
+      9  o211a
+      9  or2
+      8  and4
+      8  or3
+      8  or4b
+      4  a32o
+      3  a211o
+      3  a22o
+      3  and4b
+      3  o21ai
+      2  a21bo
+      2  a221o
+      2  nor4
+      2  o22ai
+      2  o311a
+      2  o31ai
+      2  o32a
+      1  a211oi
+      1  a221oi
+      1  a311o
+      1  a41oi
+      1  buf
+      1  conb
+      1  nand3
+      1  nand3b
+      1  nor3
+      1  o211ai
+      1  o21ba
+      1  o221a
+      1  o22a
+      1  o2bb2a
+      1  or4bb
+Wrote generated/puzzle-success-backwards-cone.dot
+Render with: dot -Tsvg generated/puzzle-success-backwards-cone.dot -o generated/puzzle-success-backwards-cone.svg
+</pre></div></div></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><h2>3. Rehearse the method on the warm-up</h2>
 <p>Before interpreting 92 state bits, we'll test the pipeline on something small. The warm-up contains two eight-bit enabled shift registers. Once those are recognized, <code>success</code> is a function of only the 16 register bits. Enumerating all <code>2^16 = 65,536</code> assignments is pretty reasonable.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">25</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">2 lines of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist artifacts/netlists/warmup.json shift-registers
+<article class="cell code"><div class="gutter"><span class="count">47</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">2 lines of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist artifacts/netlists/warmup.json shift-registers
 !python -m examples.warmup_exhaustive</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Number of shift registers: 2
 
 shift_A: ShiftRegister[8]
@@ -210,7 +336,7 @@ distinct A+B values: [496]
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Success is always 0, but on application of this particular input, and setting the enable to 0, results in some output. With some educated guesswork, we can try seeing what ASCII characters this output corresponds to, and we find that it says &quot;TRY AGAIN&quot;. Which (and how many) input bits did we feed in the first place?</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">8</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from tools.helpers.vcd import inputs_at_rising_clock_edge
+<article class="cell code"><div class="gutter"><span class="count">48</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from tools.helpers.vcd import inputs_at_rising_clock_edge
 
 samples = inputs_at_rising_clock_edge(&#x27;example_inputs.vcd&#x27;)
 attempts, current = [], []
@@ -235,7 +361,7 @@ Input  1 :
 </pre></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Okay! Each input attempt appears to be 121 bits long. The actual inputs bits are also dumped into the output, can we possibly make sense of them? Lets try 11 groups of 11, and convert the 11-bit long strings into a decimal number. With a little trial and error, turns out they are ASCII characters encoded little-endian style (the first bit into the circuit is the most significant bit). Lets decode it:</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">9</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">10 lines of code</div><div class="fold-body"><pre>def decode_eleven_bit_words(bits):
+<article class="cell code"><div class="gutter"><span class="count">49</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">10 lines of code</div><div class="fold-body"><pre>def decode_eleven_bit_words(bits):
     values = [
         sum(bit &lt;&lt; offset for offset, bit in enumerate(bits[start:start + 11]))
         for start in range(0, len(bits), 11)
@@ -256,7 +382,7 @@ Great. Now, a natural thing to do is to treat this like a black box and write co
 <p>Most of the 92 flops are <code>dfrtp</code> (on reset, Q = 0). Four are <code>dfstp</code>: reset <em>sets</em> them to 1. Four more are <code>dfxtp</code> and have no reset pin at all.</p>
 <p>There's also that floating net <code>n0550</code>. For now force it to 0 - since it doesn't influence success anyway, we'll investigate it at the end.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">10</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from pathlib import Path
+<article class="cell code"><div class="gutter"><span class="count">50</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from pathlib import Path
 
 from tools.netlist_ir import Design
 from tools.circuit_eval import CircuitEvaluator
@@ -278,7 +404,10 @@ print(&#x27;success is driven by:&#x27;, [t.name for t in design.resolve_net(&#x
 flip-flops: 92
 success is driven by: [&#x27;U28_dfrtp_2.Q&#x27;]
 </pre></div></div></article>
-<article class="cell code"><div class="gutter"><span class="count">11</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">11 lines of code</div><div class="fold-body"><pre>q = sim.q
+<article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><h3>5.1 Santiy checks, edge cases</h3>
+<p>We'll start with simply replaying the input that was present in example_inputs.vcd and seeing whether the output matches. After that, we'll try all zeros and all ones as input and see what we get.</p>
+</div></article>
+<article class="cell code"><div class="gutter"><span class="count">51</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">19 lines of code</div><div class="fold-body"><pre>q = sim.q
 reset_state = sim.reset_state
 tick = sim.tick
 scan = sim.scan
@@ -289,26 +418,26 @@ for index, bits in enumerate(attempts, 1):
     byte_values, success_values = replay_attempt(bits)
     text = bytes(byte_values).split(b&#x27;\0&#x27;, 1)[0].decode(&#x27;ascii&#x27;)
     print(f&#x27;attempt {index}: {text!r}  success={any(success_values)}&#x27;)
+
+for label, bits in (
+    (&#x27;all zeros&#x27;, &#x27;0&#x27; * 121),
+    (&#x27;all ones&#x27;, &#x27;1&#x27; * 121),
+):
+    byte_values, success_values = replay_attempt(bits)
+    text = bytes(byte_values).split(b&#x27;\0&#x27;, 1)[0].decode(&#x27;ascii&#x27;)
+    print(f&#x27;{label}: {text!r}  success={any(success_values)}&#x27;)
 </pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">attempt 1: &#x27;TRY AGAIN&#x27;  success=False
 attempt 2: &#x27;TRY AGAIN&#x27;  success=False
+all zeros: &#x27;EMPTY SKY&#x27;  success=False
+all ones: &#x27;BIG BANG&#x27;  success=False
 </pre></div></div></article>
-<article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Our sanity check worked, replaying the inputs that were played in <code>example_inputs.vcd</code> produces the same output. Now we can start opening the box. We'll attempt to slowly abstract groups of flip-flops into functions we understand; hopefully after enough passes things will start to make sense.</p>
+<article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Our sanity check worked, replaying the inputs that were played in <code>example_inputs.vcd</code> produces the same output. All zeros yields <code>EMPTY SKY</code>, all ones yields <code>BIG BANG</code>, and <code>success</code> stays false for both. Now we can start opening the box. We'll attempt to slowly abstract groups of flip-flops into functions we understand; hopefully after enough passes things will start to make sense.</p>
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><h2>6. Grouping flip-flops</h2>
 <h3>6.1. Shift Registers</h3>
 <p>Taking inspiration from the warm-up; if <code>I</code> is a 121-bit serial stream, it probably lands in a shift register: a mux in front of a D-flop, the mux selecting between &quot;hold Q&quot; and &quot;take the previous bit,&quot; repeated down a chain. We look for that wiring and find a 12-bit shift register. We'll also visualize it - draw the shift register, and its incoming and outgoing connections.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">11</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!dot -Tsvg artifacts/explainers/puzzle-shift-register-block.dot -o generated/puzzle-shift-register-block.svg</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">10 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Number of shift registers: 1
-
-shift_I: ShiftRegister[12]
-  serial input: I
-  enable:       n0005
-  clock:        clk
-  members:      12 mux, 12 flip-flops
-
-Wrote generated/puzzle-shift-register-block.dot
-Render with: dot -Tsvg generated/puzzle-shift-register-block.dot -o generated/puzzle-shift-register-block.svg
-</pre></div></div></div></div></article>
+<article class="cell code"><div class="gutter"><span class="count">52</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!dot -Tsvg artifacts/explainers/puzzle-shift-register-block.dot -o generated/puzzle-shift-register-block.svg</pre></div></div></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><img src="media/generated/puzzle-shift-register-block.svg" alt="shift_I and the four Q bits that leave it" width="560">
 
 </div></article>
@@ -330,7 +459,7 @@ Render with: dot -Tsvg generated/puzzle-shift-register-block.dot -o generated/pu
 </ul>
 <p>We first extract all the SCCs, and will later probe what each of them do.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">12</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">23 lines of code</div><div class="fold-body"><pre>from collections import Counter
+<article class="cell code"><div class="gutter"><span class="count">53</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">23 lines of code</div><div class="fold-body"><pre>from collections import Counter
 from tools.state_graph import classify_two_bit_sccs, strongly_connected_components
 
 sr = design.strict_shift_registers().shift_registers[0]
@@ -360,7 +489,7 @@ for size, count in sorted(Counter(len(component) for component in sccs).items())
   1 of size 8
   1 of size 9
 </pre></div></div></article>
-<article class="cell code"><div class="gutter"><span class="count">13</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!dot -Tsvg artifacts/explainers/blocks-structural.dot -o generated/blocks-structural.svg</pre></div></div></div></div></article>
+<article class="cell code"><div class="gutter"><span class="count">54</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!dot -Tsvg artifacts/explainers/blocks-structural.dot -o generated/blocks-structural.svg</pre></div></div></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><img src="media/generated/blocks-structural.svg" alt="structural block overview" width="650">
 
 </div></article>
@@ -370,7 +499,7 @@ We'll start with the 9-bit FSM, it's quite big and doesn't even depend on the in
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><h3>6.3. The 9 bit FSM</h3>
 <p>Hold <code>I</code> at 0, set <code>enable = 1</code> for some click cycles, and observe how the 9 bits evolve.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">24</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">33 lines of code</div><div class="fold-body"><pre>import importlib
+<article class="cell code"><div class="gutter"><span class="count">55</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">33 lines of code</div><div class="fold-body"><pre>import importlib
 import tools.helpers.display as _hub_display
 importlib.reload(_hub_display)
 from tools.helpers.display import show_bit_trace
@@ -409,12 +538,12 @@ show_bit_trace(
 <p>If the 121 bits are an 11×11 board, <code>COLCOUNT</code> is counting columns and <code>ROWCOUNT</code> is counting rows. The ninth bit, <code>U342</code>, represents <strong>done</strong> (all 121 bits are read).</p>
 <p>We'd mentioned previously that the shift-register's enable (net <code>n0005</code>) wasn't the enable to the circuit. Let's quickly query what drives it:</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">19</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} net n0005 --driver</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Net:        n0005
+<article class="cell code"><div class="gutter"><span class="count">56</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} net n0005 --driver</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Net:        n0005
 Driver:     U351_and2b_2.X
 </pre></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>And then check what inputs go into U351:</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">20</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U351 --inputs</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Instance:   U351_and2b_2
+<article class="cell code"><div class="gutter"><span class="count">57</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U351 --inputs</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Instance:   U351_and2b_2
   A_N        &lt;- n0324 &lt;- U342_dfrtp_2.Q
   B          &lt;- enable &lt;- enable
 </pre></div></div></article>
@@ -429,7 +558,7 @@ Driver:     U351_and2b_2.X
 <p>Two flops hold four states, so every one is probably a 2-bit counter or flag. They all read the input data stream <code>I</code> and the recently discovered column/row counters — so each is watching the board scan past and perhaps keeping some tally.</p>
 <p>Instead of tracing circuits to infer their function, lets perturb the inputs and see their outputs. We'll (effectivey) send in one-hot encoded inputs, and see which positions being equal to 1 get a response out of each FSM. If an FSM's next state differs, that position is in its <strong>territory</strong>. We'll check out a few FSMs, from which the patterm emerges.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">25</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">13 lines of code</div><div class="fold-body"><pre>from tools.play import i_toggle_hits
+<article class="cell code"><div class="gutter"><span class="count">58</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">13 lines of code</div><div class="fold-body"><pre>from tools.play import i_toggle_hits
 from tools.helpers.display import show_grids, show_color_grid
 
 thin_pairs = [info[0] for info in thin]
@@ -447,7 +576,7 @@ FSM #2: reacts to 11 cells, all in column [1]
 </pre></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Each responds to a particular <strong>column</strong> and nothing else. Eleven of the 23 FSMs are responsible for one column each. But what exactly are they responsible for?</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">26</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">11 lines of code</div><div class="fold-body"><pre># FSM #0 owns column 6. Put 0..4 stars in that column and read its two flops.
+<article class="cell code"><div class="gutter"><span class="count">59</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">11 lines of code</div><div class="fold-body"><pre># FSM #0 owns column 6. Put 0..4 stars in that column and read its two flops.
 pair = sorted(thin_pairs[0])
 col = next(iter({c % 11 for c in first_three[0]}))
 lsb, msb = pair[0], pair[1]
@@ -470,7 +599,7 @@ Ones    state
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>There are 11 other FSMs that take inputs from the <code>(row, col)</code> counter, we repeat the same change-one-position idea to idenfity their territories.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">27</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">12 lines of code</div><div class="fold-body"><pre>from tools.helpers.display import show_color_grid
+<article class="cell code"><div class="gutter"><span class="count">60</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">12 lines of code</div><div class="fold-body"><pre>from tools.helpers.display import show_color_grid
 
 fat_terr = i_toggle_hits(sim, fat_pairs)
 
@@ -486,7 +615,7 @@ show_color_grid([region_map[r][c] for r in range(11) for c in range(11)],
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p><strong>The 23rd FSM.</strong> Since we haven't yet encountered something to check the star count within rows, this will probably be it. It makes sense that there's only one FSM for it - atmost one row can be &quot;active&quot; at a time, and it refreshes itself after every 11 cycles. We can run the same perturbation analysis and see which positions it</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">28</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">17 lines of code</div><div class="fold-body"><pre>row_hits = i_toggle_hits(sim, [row_pair])[0]
+<article class="cell code"><div class="gutter"><span class="count">61</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">17 lines of code</div><div class="fold-body"><pre>row_hits = i_toggle_hits(sim, [row_pair])[0]
 show_grids((&#x27;23rd FSM&#x27;, bits_at(*row_hits)))
 silent = sorted({c % 11 for c in set(range(121)) - row_hits})
 print(f&#x27;reacts to {len(row_hits)} cells; silent on column {silent}&#x27;)
@@ -508,7 +637,7 @@ show_row_wrap_table(trials)</pre></div></div></div><div class="out-visual"><div 
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Since entering a new row wipes the count to <code>00</code>, we'd need a &quot;fail&quot; bit to flag when any row exceeds the star limit, and for that flag to remain high (fail) once set. Indeed, we find exactly that, the flip-flop responsible is U410.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">29</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">7 lines of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U410 --inputs
+<article class="cell code"><div class="gutter"><span class="count">62</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">7 lines of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U410 --inputs
 print()
 !python -m tools.analyze_netlist {ListOfNets} instance U412 --inputs
 print()
@@ -554,7 +683,7 @@ Instance:   U418_mux2_1
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><h3>6.5. The adjacency latch</h3>
 <p>The shift register <code>shift_I</code> has outputs that are accessed (tapped) by other logic gates - positions <strong>0, 9, 10, 11</strong> — which is basically the values shifted away from the current input <code>I</code> by <strong>1, 10, 11, and 12</strong> positions respectively. On an 11-position-wide grid, those four offsets are the previously-scanned neighbors of the current input: left (1), upper-right (10), directly above (11), and upper-left (12). That looks a lot like a <strong>&quot;no two neighoring stars&quot;</strong> check. We can test this too by simply putting the relevant inputs in and watching what happens.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count"></span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">15 lines of code</div><div class="fold-body"><pre># The 1-bit fail flag whose inputs are the four taps + the column counter.
+<article class="cell code"><div class="gutter"><span class="count">63</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">15 lines of code</div><div class="fold-body"><pre># The 1-bit fail flag whose inputs are the four taps + the column counter.
 tap_ffs = {sr.stages[i].flip_flop for i in (0, 9, 10, 11)}
 col_and_done = set(COLCOUNT) | {DONE}
 ADJ = next(name for name in loners
@@ -571,10 +700,9 @@ for label, bits in tests.items():
     print(f&#x27;  {q(scan(bits, clocks=13), ADJ)}   {label}&#x27;)</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">adjacency latch: U381 
 
   0   lone star
-  1   horizontal neighbor (offset 1)
-  1   diagonal across rows (offset 10)
-  1   vertical neighbor (offset 11)
-  0   same row, 10 apart (a wrap, NOT adjacent)
+  1   star at offset 1
+  1   star at offset 10
+  1   star at offset 11
 </pre></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Now that that checked out, We can rechristen the flip-flop <code>Adj</code> (for adjacency checker). The final <code>success</code> requires that it stays 0.</p>
 </div></article>
@@ -582,7 +710,7 @@ for label, bits in tests.items():
 <p>Eight singleton flops are still unaccounted for. They're connected in a unidirectional chain rather than a SCC. We might have a binary counter: bit <em>k</em> depends on bits <code>0..k</code> and no feedback loop.
 Find the chain by starting from the flop whose input is <code>done</code>, then proceed.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">31</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">27 lines of code</div><div class="fold-body"><pre>pop_bits = []
+<article class="cell code"><div class="gutter"><span class="count">64</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">27 lines of code</div><div class="fold-body"><pre>pop_bits = []
 covered = {DONE}
 remaining = set(loners) - {ADJ, BAD_ROW, &#x27;U26_dfrtp_2&#x27;, &#x27;U27_dfrtp_2&#x27;, &#x27;U28_dfrtp_2&#x27;}
 while True:
@@ -629,15 +757,15 @@ injected ones=38  counter=38
 </pre></div></div></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Okay, it simply counts the total number of 1's in our 121-bit-long input stream. The final gate whose output is the <code>success</code> pin is just a big old AND gate over all the flags and checks we've discovered. Lets work backwards from <code>success</code></p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">37</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} net success --drive</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Net:        success
+<article class="cell code"><div class="gutter"><span class="count">65</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} net success --drive</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Net:        success
 Driver:     U28_dfrtp_2.Q
 </pre></div></div></article>
-<article class="cell code"><div class="gutter"><span class="count">38</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U28 --inputs</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Instance:   U28_dfrtp_2
+<article class="cell code"><div class="gutter"><span class="count">66</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U28 --inputs</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Instance:   U28_dfrtp_2
   CLK        &lt;- n0260 &lt;- U71_clkbuf_8.X
   D          &lt;- n0280 &lt;- U33_a32o_2.X
   RESET_B    &lt;- rst_n &lt;- rst_n
 </pre></div></div></article>
-<article class="cell code"><div class="gutter"><span class="count">39</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U33 --inputs</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Instance:   U33_a32o_2
+<article class="cell code"><div class="gutter"><span class="count">67</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist {ListOfNets} instance U33 --inputs</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">Instance:   U33_a32o_2
   A1         &lt;- n0319 &lt;- U393_inv_2.Y
   A2         &lt;- n0320 &lt;- U55_and2_2.X
   A3         &lt;- n0321 &lt;- U54_and4b_2.X
@@ -654,7 +782,7 @@ AND  Adj never fired
 </code></pre>
 <p>Finally, we've interpreted all of our FSMs, the connecctivity graph looks like this:</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">40</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!dot -Tsvg artifacts/explainers/blocks-named.dot -o generated/blocks-named.svg</pre></div></div></div></div></article>
+<article class="cell code"><div class="gutter"><span class="count">68</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!dot -Tsvg artifacts/explainers/blocks-named.dot -o generated/blocks-named.svg</pre></div></div></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><img src="media/generated/blocks-named.svg" alt="named block diagram" width="950">
 
 </div></article>
@@ -666,7 +794,7 @@ AND  Adj never fired
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Hardcoding this input into the circuit and simulating gives:</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count"></span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">16 lines of code</div><div class="fold-body"><pre>bits = (
+<article class="cell code"><div class="gutter"><span class="count">69</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">16 lines of code</div><div class="fold-body"><pre>bits = (
     &quot;00000001010&quot;
     &quot;10000100000&quot;
     &quot;00000001010&quot;
@@ -682,8 +810,10 @@ AND  Adj never fired
 byte_values, success_values = replay_attempt(bits, trailing_edges=20)
 print(bytes(byte_values).split(b&#x27;\0&#x27;, 1)[0].decode(&#x27;ascii&#x27;))
 print(&#x27;success:&#x27;, success_values[0])
-</pre></div></div></div></div></article>
+</pre></div></div></div><div class="out-inline"><pre class="out-stream stdout">(* TWO STARS *)
+success: True
+</pre></div></div></article>
   </main>
-  <script src="walkthrough.js?v=928fcf0"></script>
+  <script src="walkthrough.js?v=56927b5"></script>
 </body>
 </html>
