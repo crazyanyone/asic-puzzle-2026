@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="walkthrough-revision" content="56927b5">
   <title>Reverse Engineering an ASIC</title>
-  <link rel="stylesheet" href="walkthrough.css?v=56927b5-16e9e942">
+  <link rel="stylesheet" href="walkthrough.css?v=56927b5-c827c379">
 </head>
 <body>
   <header class="toolbar">
@@ -59,7 +59,7 @@ for name in (
     &#x27;INTERNAL_7&#x27;,
 ):
     print(f&#x27;  {counts[name]:5}  {name}  [{classify(name)}]&#x27;)
-</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">12 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Unique cell types: 80
+</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">12 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Unique cell types: 80
 Instances: 9875
 Top-level labels: [&#x27;I&#x27;, &#x27;O[0]&#x27;, &#x27;O[1]&#x27;, &#x27;O[2]&#x27;, &#x27;O[3]&#x27;, &#x27;O[4]&#x27;, &#x27;O[5]&#x27;, &#x27;O[6]&#x27;, &#x27;O[7]&#x27;, &#x27;clk&#x27;, &#x27;enable&#x27;, &#x27;rst_n&#x27;, &#x27;success&#x27;, &#x27;VGND&#x27;, &#x27;VPWR&#x27;]
 
@@ -81,7 +81,7 @@ A few cell types and occurring frequencies:
 <p>The GDS file gives us the location of the pins of each gate and all metal conductors. On each layer, we merge touching wires into connected regions. Then we merge regions on adjacent layers wherever a via connects them, into one giant conducting net. Next, go through every pin on every gate and find out which net it touches, and assemble into a big list of nets and pins.</p>
 </div></article>
 <article class="cell code"><div class="gutter"><span class="count">43</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">2 lines of code</div><div class="fold-body"><pre># Extract nets from the gds. This can take a little while.
-!.venv/bin/python -m tools.extract_netlist puzzle.gds --json generated/puzzle.json</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of output</div><div class="fold-body"><pre class="out-stream stdout">top cell: puzzle
+!.venv/bin/python -m tools.extract_netlist puzzle.gds --json generated/puzzle.json</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">18 lines of output</div><div class="fold-body"><pre class="out-stream stdout">top cell: puzzle
 merging conductor layers...
   li1   raw=13931  merged regions=6680
   met1  raw=14366  merged regions=3001
@@ -111,7 +111,7 @@ if not ListOfNets.exists():
 raw = json.loads(ListOfNets.read_text())
 for name in (&#x27;n0004&#x27;, &#x27;n0008&#x27;, &#x27;n0012&#x27;):
     print(name, json.dumps(raw[&#x27;nets&#x27;][name], indent=2))
-</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">27 lines of output</div><div class="fold-body"><pre class="out-stream stdout">n0004 {
+</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">27 lines of output</div><div class="fold-body"><pre class="out-stream stdout">n0004 {
   &quot;aliases&quot;: [],
   &quot;terminals&quot;: [
     &quot;U100_dfrtp_2.Q&quot;,
@@ -141,7 +141,7 @@ n0012 {
 </pre></div></div></div></div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>A record such as <code>U119_clkbuf_4.A</code> means pin <code>A</code> of a particular clock-buffer instance touches that net. Cell model definitions from the official SKY130 Liberty data tell us pin directions and the Boolean functions they implement. If all is well, each net should have a single pin driving it, and all other pins receiving that as input. We can form a directed bipartite graph: gate outputs drive net nodes, and net nodes fan out to gate inputs - while sanity checking that each net have exactly one driver.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">45</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!.venv/bin/python -m tools.analyze_netlist {ListOfNets} summary</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">92 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Source:          generated/puzzle.json
+<article class="cell code"><div class="gutter"><span class="count">45</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">1 line of code</div><div class="fold-body"><pre>!.venv/bin/python -m tools.analyze_netlist {ListOfNets} summary</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">92 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Source:          generated/puzzle.json
 Instances:       728
 Nets:            741 (739 non-power)
 Terminals:       4223
@@ -243,7 +243,7 @@ Validation issues: 1
 </div></article>
 <article class="cell code"><div class="gutter"><span class="count">46</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">3 lines of code</div><div class="fold-body"><pre># Reproduce the  graph shown above.
 !python -m tools.analyze_netlist {ListOfNets} cone success --through-flops --dot generated/puzzle-success-backwards-cone.dot
-!dot -Tsvg generated/puzzle-success-backwards-cone.dot -o generated/puzzle-success-backwards-cone.svg</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">59 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Target net:         success
+!dot -Tsvg generated/puzzle-success-backwards-cone.dot -o generated/puzzle-success-backwards-cone.svg</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">59 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Target net:         success
 Cells in cone:      468
 Combinational:      389
 State boundaries:   0
@@ -307,7 +307,7 @@ Render with: dot -Tsvg generated/puzzle-success-backwards-cone.dot -o generated/
 <p>Before interpreting 92 state bits, we'll test the pipeline on something small. The warm-up contains two eight-bit enabled shift registers. Once those are recognized, <code>success</code> is a function of only the 16 register bits. Enumerating all <code>2^16 = 65,536</code> assignments is pretty reasonable.</p>
 </div></article>
 <article class="cell code"><div class="gutter"><span class="count">47</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">2 lines of code</div><div class="fold-body"><pre>!python -m tools.analyze_netlist artifacts/netlists/warmup.json shift-registers
-!python -m examples.warmup_exhaustive</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Number of shift registers: 2
+!python -m examples.warmup_exhaustive</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">18 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Number of shift registers: 2
 
 shift_A: ShiftRegister[8]
   serial input: A
@@ -643,7 +643,7 @@ print()
 print()
 !python -m tools.analyze_netlist {ListOfNets} instance U418 --inputs
 
-!dot -Tsvg artifacts/explainers/bad-row-sticky.dot -o generated/bad-row-sticky.svg</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">15 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Instance:   U410_dfrtp_2
+!dot -Tsvg artifacts/explainers/bad-row-sticky.dot -o generated/bad-row-sticky.svg</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">15 lines of output</div><div class="fold-body"><pre class="out-stream stdout">Instance:   U410_dfrtp_2
   CLK        &lt;- n0407 &lt;- U405_clkbuf_8.X
   D          &lt;- n0413 &lt;- U412_a31o_2.X
   RESET_B    &lt;- rst_n &lt;- rst_n
@@ -737,7 +737,7 @@ for count in [0, 1, 2, 4, 8, 22, 38]:
     bits = &#x27;1&#x27; * count + &#x27;0&#x27; * (121 - count)
     state = scan(bits)
     print(f&#x27;injected ones={count:2}  counter={population(state):2}&#x27;)
-</pre></div></div></div><div class="fold output is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">17 lines of output</div><div class="fold-body"><pre class="out-stream stdout">population bits LSB -&gt; MSB:
+</pre></div></div></div><div class="fold output"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">17 lines of output</div><div class="fold-body"><pre class="out-stream stdout">population bits LSB -&gt; MSB:
   [0] U444_dfrtp_2  cone [&#x27;U342_dfrtp_2&#x27;, &#x27;U444_dfrtp_2&#x27;]
   [1] U442_dfrtp_2  cone [&#x27;U342_dfrtp_2&#x27;, &#x27;U442_dfrtp_2&#x27;, &#x27;U444_dfrtp_2&#x27;]
   [2] U440_dfrtp_2  cone [&#x27;U342_dfrtp_2&#x27;, &#x27;U440_dfrtp_2&#x27;, &#x27;U442_dfrtp_2&#x27;, &#x27;U444_dfrtp_2&#x27;]
@@ -814,6 +814,6 @@ print(&#x27;success:&#x27;, success_values[0])
 success: True
 </pre></div></div></article>
   </main>
-  <script src="walkthrough.js?v=56927b5-16e9e942"></script>
+  <script src="walkthrough.js?v=56927b5-c827c379"></script>
 </body>
 </html>

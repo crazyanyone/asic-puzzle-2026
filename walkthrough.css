@@ -158,6 +158,10 @@ button:hover { border-color: #c8c6bc; }
   padding: 8px 12px 10px;
 }
 
+.fold.output .fold-body {
+  max-height: none;
+}
+
 .fold-body pre {
   margin: 0;
   white-space: pre-wrap;
