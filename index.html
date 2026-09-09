@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="walkthrough-revision" content="56927b5">
   <title>Reverse Engineering an ASIC</title>
-  <link rel="stylesheet" href="walkthrough.css?v=56927b5">
+  <link rel="stylesheet" href="walkthrough.css?v=56927b5-16e9e942">
 </head>
 <body>
   <header class="toolbar">
@@ -336,7 +336,7 @@ distinct A+B values: [496]
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Success is always 0, but on application of this particular input, and setting the enable to 0, results in some output. With some educated guesswork, we can try seeing what ASCII characters this output corresponds to, and we find that it says &quot;TRY AGAIN&quot;. Which (and how many) input bits did we feed in the first place?</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">48</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from tools.helpers.vcd import inputs_at_rising_clock_edge
+<article class="cell code"><div class="gutter"><span class="count">48</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from tools.helpers.vcd import inputs_at_rising_clock_edge
 
 samples = inputs_at_rising_clock_edge(&#x27;example_inputs.vcd&#x27;)
 attempts, current = [], []
@@ -382,7 +382,7 @@ Great. Now, a natural thing to do is to treat this like a black box and write co
 <p>Most of the 92 flops are <code>dfrtp</code> (on reset, Q = 0). Four are <code>dfstp</code>: reset <em>sets</em> them to 1. Four more are <code>dfxtp</code> and have no reset pin at all.</p>
 <p>There's also that floating net <code>n0550</code>. For now force it to 0 - since it doesn't influence success anyway, we'll investigate it at the end.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">50</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from pathlib import Path
+<article class="cell code"><div class="gutter"><span class="count">50</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">18 lines of code</div><div class="fold-body"><pre>from pathlib import Path
 
 from tools.netlist_ir import Design
 from tools.circuit_eval import CircuitEvaluator
@@ -407,7 +407,7 @@ success is driven by: [&#x27;U28_dfrtp_2.Q&#x27;]
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><h3>5.1 Santiy checks, edge cases</h3>
 <p>We'll start with simply replaying the input that was present in example_inputs.vcd and seeing whether the output matches. After that, we'll try all zeros and all ones as input and see what we get.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">51</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">19 lines of code</div><div class="fold-body"><pre>q = sim.q
+<article class="cell code"><div class="gutter"><span class="count">51</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">19 lines of code</div><div class="fold-body"><pre>q = sim.q
 reset_state = sim.reset_state
 tick = sim.tick
 scan = sim.scan
@@ -459,7 +459,7 @@ all ones: &#x27;BIG BANG&#x27;  success=False
 </ul>
 <p>We first extract all the SCCs, and will later probe what each of them do.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">53</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">23 lines of code</div><div class="fold-body"><pre>from collections import Counter
+<article class="cell code"><div class="gutter"><span class="count">53</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">23 lines of code</div><div class="fold-body"><pre>from collections import Counter
 from tools.state_graph import classify_two_bit_sccs, strongly_connected_components
 
 sr = design.strict_shift_registers().shift_registers[0]
@@ -558,7 +558,7 @@ Driver:     U351_and2b_2.X
 <p>Two flops hold four states, so every one is probably a 2-bit counter or flag. They all read the input data stream <code>I</code> and the recently discovered column/row counters — so each is watching the board scan past and perhaps keeping some tally.</p>
 <p>Instead of tracing circuits to infer their function, lets perturb the inputs and see their outputs. We'll (effectivey) send in one-hot encoded inputs, and see which positions being equal to 1 get a response out of each FSM. If an FSM's next state differs, that position is in its <strong>territory</strong>. We'll check out a few FSMs, from which the patterm emerges.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">58</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">13 lines of code</div><div class="fold-body"><pre>from tools.play import i_toggle_hits
+<article class="cell code"><div class="gutter"><span class="count">58</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">13 lines of code</div><div class="fold-body"><pre>from tools.play import i_toggle_hits
 from tools.helpers.display import show_grids, show_color_grid
 
 thin_pairs = [info[0] for info in thin]
@@ -615,7 +615,7 @@ show_color_grid([region_map[r][c] for r in range(11) for c in range(11)],
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p><strong>The 23rd FSM.</strong> Since we haven't yet encountered something to check the star count within rows, this will probably be it. It makes sense that there's only one FSM for it - atmost one row can be &quot;active&quot; at a time, and it refreshes itself after every 11 cycles. We can run the same perturbation analysis and see which positions it</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">61</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">17 lines of code</div><div class="fold-body"><pre>row_hits = i_toggle_hits(sim, [row_pair])[0]
+<article class="cell code"><div class="gutter"><span class="count">61</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">17 lines of code</div><div class="fold-body"><pre>row_hits = i_toggle_hits(sim, [row_pair])[0]
 show_grids((&#x27;23rd FSM&#x27;, bits_at(*row_hits)))
 silent = sorted({c % 11 for c in set(range(121)) - row_hits})
 print(f&#x27;reacts to {len(row_hits)} cells; silent on column {silent}&#x27;)
@@ -683,7 +683,7 @@ Instance:   U418_mux2_1
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><h3>6.5. The adjacency latch</h3>
 <p>The shift register <code>shift_I</code> has outputs that are accessed (tapped) by other logic gates - positions <strong>0, 9, 10, 11</strong> — which is basically the values shifted away from the current input <code>I</code> by <strong>1, 10, 11, and 12</strong> positions respectively. On an 11-position-wide grid, those four offsets are the previously-scanned neighbors of the current input: left (1), upper-right (10), directly above (11), and upper-left (12). That looks a lot like a <strong>&quot;no two neighoring stars&quot;</strong> check. We can test this too by simply putting the relevant inputs in and watching what happens.</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">63</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">15 lines of code</div><div class="fold-body"><pre># The 1-bit fail flag whose inputs are the four taps + the column counter.
+<article class="cell code"><div class="gutter"><span class="count">63</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">15 lines of code</div><div class="fold-body"><pre># The 1-bit fail flag whose inputs are the four taps + the column counter.
 tap_ffs = {sr.stages[i].flip_flop for i in (0, 9, 10, 11)}
 col_and_done = set(COLCOUNT) | {DONE}
 ADJ = next(name for name in loners
@@ -794,7 +794,7 @@ AND  Adj never fired
 </div></article>
 <article class="cell markdown"><div class="gutter"></div><div class="markdown-body"><p>Hardcoding this input into the circuit and simulating gives:</p>
 </div></article>
-<article class="cell code"><div class="gutter"><span class="count">69</span></div><div><div class="fold code is-collapsed"><button type="button" class="fold-toggle" title="Expand or collapse">▸</button><div><div class="fold-meta">16 lines of code</div><div class="fold-body"><pre>bits = (
+<article class="cell code"><div class="gutter"><span class="count">69</span></div><div><div class="fold code"><button type="button" class="fold-toggle" title="Expand or collapse">▾</button><div><div class="fold-meta">16 lines of code</div><div class="fold-body"><pre>bits = (
     &quot;00000001010&quot;
     &quot;10000100000&quot;
     &quot;00000001010&quot;
@@ -814,6 +814,6 @@ print(&#x27;success:&#x27;, success_values[0])
 success: True
 </pre></div></div></article>
   </main>
-  <script src="walkthrough.js?v=56927b5"></script>
+  <script src="walkthrough.js?v=56927b5-16e9e942"></script>
 </body>
 </html>
